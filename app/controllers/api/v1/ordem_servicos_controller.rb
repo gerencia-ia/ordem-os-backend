@@ -2,8 +2,16 @@
 
 module Api
   module V1
-    class OrdemServicosController < ApplicationController
-      before_action :set_ordem_servico, only: [:show, :update, :destroy]
+    class OrdemServicosController < BaseController
+      before_action :set_ordem_servico, only: [:show, :update, :destroy, :update_status]
+      # Exemplo: apenas SECRETARIA pode criar e remover ordens
+      before_action only: [:create, :destroy] do
+        require_role!('SECRETARIA', 'TECNICO')
+      end
+      # Exemplo: SECRETARIA e TECNICO podem atualizar status
+      before_action only: [:update_status] do
+        require_role!('SECRETARIA', 'TECNICO')
+      end
 
       def index
         if params[:cliente_id].present?
@@ -38,6 +46,16 @@ module Api
       def destroy
         @ordem_servico.destroy
         head :no_content
+      end
+
+      # Atualiza apenas o status_id da ordem de serviço
+      def update_status
+        @ordem_servico = OrdemServico.find(params[:id])
+        if @ordem_servico.update(status_id: params[:status_id])
+          render json: @ordem_servico
+        else
+          render json: @ordem_servico.errors, status: :unprocessable_entity
+        end
       end
 
       private

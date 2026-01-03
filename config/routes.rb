@@ -7,8 +7,14 @@ Rails.application.routes.draw do
       resources :servicos
       resources :status
       resources :tecnicos
-      resources :ordem_servicos
+        resources :ordem_servicos do
+          member do
+            patch :update_status
+          end
+        end
       resources :prioridades
+
+      post 'login', to: 'sessions#create'
 
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
