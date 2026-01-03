@@ -1,5 +1,6 @@
 class User < ApplicationRecord
   has_secure_password
+  has_one :tecnico, foreign_key: 'cpf', primary_key: 'cpf'
 
   ROLES = { secretaria: 0, tecnico: 1 }.freeze
   ROLE_VALUES = ROLES.values.freeze

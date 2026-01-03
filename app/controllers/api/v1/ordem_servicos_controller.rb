@@ -6,7 +6,7 @@ module Api
       before_action :set_ordem_servico, only: [:show, :update, :destroy, :update_status]
       # Exemplo: apenas SECRETARIA pode criar e remover ordens
       before_action only: [:create, :destroy] do
-        require_role!('SECRETARIA', 'TECNICO')
+        require_role!('SECRETARIA')
       end
       # Exemplo: SECRETARIA e TECNICO podem atualizar status
       before_action only: [:update_status] do
@@ -14,7 +14,12 @@ module Api
       end
 
       def index
-        if params[:cliente_id].present?
+        # Se técnico autenticado, mostrar apenas suas OS
+        if @current_user.role == 1 && @current_tecnico_id
+          @ordem_servicos = OrdemServico.joins(:os_tecnicos)
+            .where(os_tecnicos: { tecnico_id: @current_tecnico_id })
+            .distinct
+        elsif params[:cliente_id].present?
           @ordem_servicos = OrdemServico.where(cliente_id: params[:cliente_id])
         else
           @ordem_servicos = OrdemServico.all
