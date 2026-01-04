@@ -3,7 +3,7 @@
 module Api
   module V1
     class EquipamentosController < ApplicationController
-      before_action :set_equipamento, only: [:show, :update, :destroy]
+      before_action :set_equipamento, only: [:show, :update, :destroy, :historico_laudos]
 
       def index
         if params[:cliente_id].present?
@@ -38,6 +38,34 @@ module Api
       def destroy
         @equipamento.destroy
         head :no_content
+      end
+
+      # Retorna o histórico de laudos do equipamento em todas as ordens de serviço
+      def historico_laudos
+        laudos = OsEquipamento.includes(ordem_servico: [:status, :prioridade])
+                              .where(equipamento_id: @equipamento.id)
+                              .where.not(laudo: [nil, ''])
+                              .order('ordem_servicos.created_at DESC')
+
+        resultado = laudos.map do |oe|
+          {
+            id: oe.id,
+            laudo: oe.laudo,
+            created_at: oe.created_at,
+            updated_at: oe.updated_at,
+            ordem_servico: {
+              id: oe.ordem_servico.id,
+              numero_ordem: oe.ordem_servico.numero_ordem,
+              descricao: oe.ordem_servico.descricao,
+              data_agendamento: oe.ordem_servico.data_agendamento,
+              data_fechamento: oe.ordem_servico.data_fechamento,
+              status: oe.ordem_servico.status&.nome,
+              prioridade: oe.ordem_servico.prioridade&.descricao
+            }
+          }
+        end
+
+        render json: resultado
       end
 
       private

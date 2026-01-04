@@ -3,13 +3,18 @@ Rails.application.routes.draw do
  namespace :api do
     namespace :v1 do
       resources :clientes
-      resources :equipamentos
+      resources :equipamentos do
+        member do
+          get :historico_laudos
+        end
+      end
       resources :servicos
       resources :status
       resources :tecnicos
         resources :ordem_servicos do
           member do
             patch :update_status
+            patch 'equipamentos/:equipamento_id/laudo', to: 'ordem_servicos#update_laudo'
           end
         end
       resources :prioridades

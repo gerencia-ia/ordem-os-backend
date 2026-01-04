@@ -3,15 +3,12 @@
 module Api
   module V1
     class OrdemServicosController < BaseController
-      before_action :set_ordem_servico, only: [:show, :update, :destroy, :update_status]
+      before_action :set_ordem_servico, only: [:show, :update, :destroy, :update_status, :update_laudo]
       # Exemplo: apenas SECRETARIA pode criar e remover ordens
       before_action only: [:create, :destroy] do
         require_role!('SECRETARIA')
       end
-      # Exemplo: SECRETARIA e TECNICO podem atualizar status
-      before_action only: [:update_status] do
-        require_role!('SECRETARIA', 'TECNICO')
-      end
+      
 
       def index
         # Se técnico autenticado, mostrar apenas suas OS
@@ -63,6 +60,27 @@ module Api
         end
       end
 
+      # Atualiza o laudo de um equipamento específico na OS
+      def update_laudo
+        os_equipamento = @ordem_servico.os_equipamentos.find_by(equipamento_id: params[:equipamento_id])
+        
+        if os_equipamento.nil?
+          render json: { error: "Equipamento não encontrado nesta ordem de serviço" }, status: :not_found
+          return
+        end
+
+        if os_equipamento.update(laudo: params[:laudo])
+          render json: { 
+            id: os_equipamento.id,
+            equipamento_id: os_equipamento.equipamento_id,
+            laudo: os_equipamento.laudo,
+            ordem_servico_id: @ordem_servico.id
+          }, status: :ok
+        else
+          render json: os_equipamento.errors, status: :unprocessable_entity
+        end
+      end
+
       private
 
       def set_ordem_servico
@@ -85,9 +103,12 @@ module Api
           :data_vencimento,
           :custo_estimado,
           :cliente_id,
+          :data_inicio_atendimento,
+          :data_fim_atendimento,
           tecnico_ids: [],
           servico_ids: [],
-          equipamento_ids: []
+          equipamento_ids: [],
+          os_equipamentos_attributes: [:id, :equipamento_id, :laudo, :_destroy]
         )
       end
     end
