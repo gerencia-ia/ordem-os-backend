@@ -3,5 +3,5 @@
 class Equipamento < ApplicationRecord
   belongs_to :cliente
 
-  validates :marca, :btus, :local_instalacao, :observacao, presence: true
+  validates :marca, :btus, :local_instalacao, presence: true
 end

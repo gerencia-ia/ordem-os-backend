@@ -17,6 +17,8 @@ Rails.application.routes.draw do
             patch 'equipamentos/:equipamento_id/laudo', to: 'ordem_servicos#update_laudo'
             post 'servicos', to: 'ordem_servicos#add_servico'
             delete 'servicos/:servico_id', to: 'ordem_servicos#remove_servico'
+            post 'tecnicos', to: 'ordem_servicos#add_tecnico'
+            delete 'tecnicos/:tecnico_id', to: 'ordem_servicos#remove_tecnico'
           end
         end
       resources :prioridades

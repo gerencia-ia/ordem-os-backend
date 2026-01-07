@@ -53,9 +53,9 @@ module Api
       def cliente_params
         params.require(:cliente).permit(
           :nome, :email, :data_registro,
-          enderecos_attributes: [:rua, :numero, :bairro, :complemento, :cidade],
-          telefones_attributes: [:numero, :tipo],
-          equipamentos_attributes: [:marca, :btus, :local_instalacao, :observacao]
+          enderecos_attributes: [:id, :rua, :numero, :bairro, :complemento, :cidade, :_destroy],
+          telefones_attributes: [:id, :numero, :tipo, :_destroy],
+          equipamentos_attributes: [:id, :marca, :btus, :local_instalacao, :observacao, :_destroy]
         )
       end
     end

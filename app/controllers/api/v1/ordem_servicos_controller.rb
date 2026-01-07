@@ -3,11 +3,8 @@
 module Api
   module V1
     class OrdemServicosController < BaseController
-      before_action :set_ordem_servico, only: [:show, :update, :destroy, :update_status, :update_laudo, :add_servico, :remove_servico]
+      before_action :set_ordem_servico, only: [:show, :update, :destroy, :update_status, :update_laudo, :add_servico, :remove_servico, :add_tecnico, :remove_tecnico]
       # Exemplo: apenas SECRETARIA pode criar e remover ordens
-      before_action only: [:create, :destroy] do
-        require_role!('SECRETARIA')
-      end
 
       def index
         # Se técnico autenticado, mostrar apenas suas OS
@@ -108,6 +105,33 @@ module Api
         return render json: { error: "Serviço não associado à ordem de serviço" }, status: :not_found unless os_servico
 
         os_servico.destroy
+        head :no_content
+      end
+
+      # Adiciona um técnico à ordem de serviço (via os_tecnicos)
+      def add_tecnico
+        tecnico = Tecnico.find_by(id: params[:tecnico_id])
+        return render json: { error: "Técnico não encontrado" }, status: :not_found unless tecnico
+
+        os_tecnico = @ordem_servico.os_tecnicos.find_or_initialize_by(tecnico_id: tecnico.id)
+
+        if os_tecnico.persisted?
+          return render json: { id: os_tecnico.id, ordem_servico_id: @ordem_servico.id, tecnico_id: tecnico.id }, status: :ok
+        end
+
+        if os_tecnico.save
+          render json: { id: os_tecnico.id, ordem_servico_id: @ordem_servico.id, tecnico_id: tecnico.id }, status: :created
+        else
+          render json: os_tecnico.errors, status: :unprocessable_entity
+        end
+      end
+
+      # Remove um técnico da ordem de serviço (via os_tecnicos)
+      def remove_tecnico
+        os_tecnico = @ordem_servico.os_tecnicos.find_by(tecnico_id: params[:tecnico_id])
+        return render json: { error: "Técnico não associado à ordem de serviço" }, status: :not_found unless os_tecnico
+
+        os_tecnico.destroy
         head :no_content
       end
 
