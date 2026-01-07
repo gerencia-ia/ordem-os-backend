@@ -3,12 +3,11 @@
 module Api
   module V1
     class OrdemServicosController < BaseController
-      before_action :set_ordem_servico, only: [:show, :update, :destroy, :update_status, :update_laudo]
+      before_action :set_ordem_servico, only: [:show, :update, :destroy, :update_status, :update_laudo, :add_servico, :remove_servico]
       # Exemplo: apenas SECRETARIA pode criar e remover ordens
       before_action only: [:create, :destroy] do
         require_role!('SECRETARIA')
       end
-      
 
       def index
         # Se técnico autenticado, mostrar apenas suas OS
@@ -79,6 +78,35 @@ module Api
         else
           render json: os_equipamento.errors, status: :unprocessable_entity
         end
+      end
+
+      # Adiciona um serviço à ordem de serviço
+      def add_servico
+        servico = Servico.find_by(id: params[:servico_id])
+        return render json: { error: "Serviço não encontrado" }, status: :not_found unless servico
+
+        os_servico = @ordem_servico.os_servicos.find_or_initialize_by(servico_id: servico.id)
+        os_servico.quantidade = params[:quantidade] if params[:quantidade].present?
+
+        if os_servico.save
+          render json: {
+            id: os_servico.id,
+            ordem_servico_id: @ordem_servico.id,
+            servico_id: servico.id,
+            quantidade: os_servico.quantidade
+          }, status: :created
+        else
+          render json: os_servico.errors, status: :unprocessable_entity
+        end
+      end
+
+      # Remove um serviço da ordem de serviço
+      def remove_servico
+        os_servico = @ordem_servico.os_servicos.find_by(servico_id: params[:servico_id])
+        return render json: { error: "Serviço não associado à ordem de serviço" }, status: :not_found unless os_servico
+
+        os_servico.destroy
+        head :no_content
       end
 
       private

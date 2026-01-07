@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_01_04_000000) do
+ActiveRecord::Schema[8.0].define(version: 2026_01_07_000000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -47,7 +47,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_04_000000) do
 
   create_table "ordem_servicos", force: :cascade do |t|
     t.bigint "status_id"
-    t.date "data_agendamento"
+    t.datetime "data_agendamento"
     t.date "data_fechamento"
     t.string "observacao"
     t.bigint "prioridade_id"
