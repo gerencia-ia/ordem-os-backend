@@ -5,8 +5,9 @@ class OrdemServicoSerializer < ActiveModel::Serializer
              :status_id, :status_descricao,
              :prioridade_id, :prioridade_descricao,
              :data_agendamento, :data_fechamento, :data_vencimento,
+             :data_inicio_atendimento, :data_fim_atendimento,
              :created_at, :updated_at,
-             :cliente_id, :observacao, :custo_estimado, :valor_total, :notas,
+             :cliente_id, :cliente_nome, :observacao, :custo_estimado, :valor_total, :notas,
              :cliente, :tecnico_responsavel, :servicos, :equipamentos
 
   def status_descricao
@@ -15,6 +16,10 @@ class OrdemServicoSerializer < ActiveModel::Serializer
 
   def prioridade_descricao
     object.prioridade&.descricao
+  end
+
+  def cliente_nome
+    object.cliente&.nome
   end
 
   def cliente
@@ -52,12 +57,14 @@ class OrdemServicoSerializer < ActiveModel::Serializer
     end
   end
   def equipamentos
-    object.equipamentos.map do |e|
+    object.os_equipamentos.includes(:equipamento).map do |oe|
+      e = oe.equipamento
       {
-        id: e.id,
+        id: e&.id,
         marca: e.try(:marca),
         btus: e.try(:btus),
-        local_instalacao: e.try(:local_instalacao)
+        local_instalacao: e.try(:local_instalacao),
+        laudo: oe.laudo
       }
     end
   end

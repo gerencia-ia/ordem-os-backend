@@ -14,14 +14,25 @@ module Api
         render json: @tecnico
       end
 
-      def create
+    def create
         @tecnico = Tecnico.new(tecnico_params)
-        if @tecnico.save
-          render json: @tecnico, status: :created
-        else
-          render json: @tecnico.errors, status: :unprocessable_entity
+
+        ActiveRecord::Base.transaction do
+          if @tecnico.save
+            User.create!(
+              cpf: tecnico_params[:cpf],
+              password: params[:senha] || '123456',
+              role: :tecnico
+            )
+
+            render json: @tecnico, status: :created
+          else
+            render json: @tecnico.errors, status: :unprocessable_entity
+            raise ActiveRecord::Rollback
+          end
         end
       end
+
 
       def update
         if @tecnico.update(tecnico_params)
@@ -45,7 +56,7 @@ module Api
       end
 
       def tecnico_params
-        params.require(:tecnico).permit(:nome,:email,:telefone, especialidades: [])
+        params.require(:tecnico).permit(:nome, :email, :telefone, :cpf, especialidades: [])
       end
     end
   end

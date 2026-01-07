@@ -13,6 +13,7 @@ class OrdemServico < ApplicationRecord
   
   has_many :os_equipamentos, dependent: :destroy
   has_many :equipamentos, through: :os_equipamentos
+  accepts_nested_attributes_for :os_equipamentos, allow_destroy: true
   
   has_many :tarefas, dependent: :destroy
   

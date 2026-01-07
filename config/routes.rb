@@ -3,12 +3,27 @@ Rails.application.routes.draw do
  namespace :api do
     namespace :v1 do
       resources :clientes
-      resources :equipamentos
+      resources :equipamentos do
+        member do
+          get :historico_laudos
+        end
+      end
       resources :servicos
       resources :status
       resources :tecnicos
-      resources :ordem_servicos
+        resources :ordem_servicos do
+          member do
+            patch :update_status
+            patch 'equipamentos/:equipamento_id/laudo', to: 'ordem_servicos#update_laudo'
+            post 'servicos', to: 'ordem_servicos#add_servico'
+            delete 'servicos/:servico_id', to: 'ordem_servicos#remove_servico'
+            post 'tecnicos', to: 'ordem_servicos#add_tecnico'
+            delete 'tecnicos/:tecnico_id', to: 'ordem_servicos#remove_tecnico'
+          end
+        end
       resources :prioridades
+
+      post 'login', to: 'sessions#create'
 
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 

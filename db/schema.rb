@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_12_26_010621) do
+ActiveRecord::Schema[8.0].define(version: 2026_01_07_000000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -47,7 +47,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_26_010621) do
 
   create_table "ordem_servicos", force: :cascade do |t|
     t.bigint "status_id"
-    t.date "data_agendamento"
+    t.datetime "data_agendamento"
     t.date "data_fechamento"
     t.string "observacao"
     t.bigint "prioridade_id"
@@ -60,6 +60,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_26_010621) do
     t.date "data_vencimento"
     t.decimal "custo_estimado", precision: 10, scale: 2
     t.bigint "cliente_id"
+    t.datetime "data_inicio_atendimento"
+    t.datetime "data_fim_atendimento"
     t.index ["cliente_id"], name: "index_ordem_servicos_on_cliente_id"
     t.index ["prioridade_id"], name: "index_ordem_servicos_on_prioridade_id"
     t.index ["status_id"], name: "index_ordem_servicos_on_status_id"
@@ -134,6 +136,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_26_010621) do
     t.datetime "updated_at", null: false
     t.string "email"
     t.string "status_disponibilidade", default: "disponivel"
+    t.string "cpf", null: false
+    t.index ["cpf"], name: "index_tecnicos_on_cpf", unique: true
   end
 
   create_table "telefones", force: :cascade do |t|
@@ -148,6 +152,15 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_26_010621) do
     t.string "nome"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "users", force: :cascade do |t|
+    t.string "cpf", null: false
+    t.string "password_digest", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "role", default: 0, null: false
+    t.index ["cpf"], name: "index_users_on_cpf", unique: true
   end
 
   add_foreign_key "ordem_servicos", "clientes"
