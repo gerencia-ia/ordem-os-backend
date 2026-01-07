@@ -7,7 +7,7 @@ class OrdemServicoSerializer < ActiveModel::Serializer
              :data_agendamento, :data_fechamento, :data_vencimento,
              :data_inicio_atendimento, :data_fim_atendimento,
              :created_at, :updated_at,
-             :cliente_id, :observacao, :custo_estimado, :valor_total, :notas,
+             :cliente_id, :cliente_nome, :observacao, :custo_estimado, :valor_total, :notas,
              :cliente, :tecnico_responsavel, :servicos, :equipamentos
 
   def status_descricao
@@ -16,6 +16,10 @@ class OrdemServicoSerializer < ActiveModel::Serializer
 
   def prioridade_descricao
     object.prioridade&.descricao
+  end
+
+  def cliente_nome
+    object.cliente&.nome
   end
 
   def cliente

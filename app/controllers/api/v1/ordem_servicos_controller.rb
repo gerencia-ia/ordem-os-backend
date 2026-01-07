@@ -12,13 +12,15 @@ module Api
       def index
         # Se técnico autenticado, mostrar apenas suas OS
         if @current_user.role == 1 && @current_tecnico_id
-          @ordem_servicos = OrdemServico.joins(:os_tecnicos)
+          @ordem_servicos = OrdemServico.includes(:cliente, :tecnicos, :status, :prioridade)
+            .joins(:os_tecnicos)
             .where(os_tecnicos: { tecnico_id: @current_tecnico_id })
             .distinct
         elsif params[:cliente_id].present?
-          @ordem_servicos = OrdemServico.where(cliente_id: params[:cliente_id])
+          @ordem_servicos = OrdemServico.includes(:cliente, :tecnicos, :status, :prioridade)
+            .where(cliente_id: params[:cliente_id])
         else
-          @ordem_servicos = OrdemServico.all
+          @ordem_servicos = OrdemServico.includes(:cliente, :tecnicos, :status, :prioridade).all
         end
         render json: @ordem_servicos
       end
