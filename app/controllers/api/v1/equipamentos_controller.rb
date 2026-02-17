@@ -58,7 +58,7 @@ module Api
               numero_ordem: oe.ordem_servico.numero_ordem,
               descricao: oe.ordem_servico.descricao,
               data_agendamento: oe.ordem_servico.data_agendamento,
-              data_fechamento: oe.ordem_servico.data_fechamento,
+              data_fechamento: oe.ordem_servico.data_fim_atendimento,
               status: oe.ordem_servico.status&.nome,
               prioridade: oe.ordem_servico.prioridade&.descricao
             }

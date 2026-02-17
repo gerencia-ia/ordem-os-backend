@@ -48,11 +48,16 @@ class OrdemServicoSerializer < ActiveModel::Serializer
     }
   end
  def servicos
-    object.servicos.map do |s|
+    object.servicos.includes(:categorias_servico).map do |s|
       {
         id: s.id,
         nome: s.try(:nome),
-        valor: s.try(:valor)
+        valor: s.try(:valor),
+        tempo_servico: s.try(:tempo_servico),
+        categoria: s.categorias_servico ? {
+          id: s.categorias_servico.id,
+          descricao: s.categorias_servico.descricao
+        } : nil
       }
     end
   end
