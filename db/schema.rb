@@ -10,9 +10,15 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_01_07_000000) do
+ActiveRecord::Schema[8.0].define(version: 2026_02_16_225724) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+
+  create_table "categorias_servicos", force: :cascade do |t|
+    t.string "descricao", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
 
   create_table "clientes", force: :cascade do |t|
     t.string "nome"
@@ -20,6 +26,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_07_000000) do
     t.datetime "updated_at", null: false
     t.string "email"
     t.datetime "data_registro"
+    t.date "data_ultima_visita"
   end
 
   create_table "enderecos", force: :cascade do |t|
@@ -107,6 +114,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_07_000000) do
     t.decimal "valor"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "tempo_servico"
+    t.bigint "categorias_servico_id"
+    t.index ["categorias_servico_id"], name: "index_servicos_on_categorias_servico_id"
   end
 
   create_table "status", force: :cascade do |t|
@@ -148,12 +158,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_07_000000) do
     t.index ["cliente_id"], name: "index_telefones_on_cliente_id"
   end
 
-  create_table "testes", force: :cascade do |t|
-    t.string "nome"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-  end
-
   create_table "users", force: :cascade do |t|
     t.string "cpf", null: false
     t.string "password_digest", null: false
@@ -164,6 +168,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_07_000000) do
   end
 
   add_foreign_key "ordem_servicos", "clientes"
+  add_foreign_key "servicos", "categorias_servicos"
   add_foreign_key "tarefas", "ordem_servicos"
   add_foreign_key "tarefas", "tecnicos"
 end

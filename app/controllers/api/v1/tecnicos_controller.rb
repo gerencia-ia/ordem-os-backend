@@ -20,7 +20,7 @@ module Api
         ActiveRecord::Base.transaction do
           if @tecnico.save
             User.create!(
-              cpf: tecnico_params[:cpf],
+              cpf: "#{tecnico_params[:cpf][0, 3]}@aka",
               password: params[:senha] || '123456',
               role: :tecnico
             )

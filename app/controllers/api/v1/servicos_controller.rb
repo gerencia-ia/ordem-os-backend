@@ -6,8 +6,8 @@ module Api
       before_action :set_servico, only: [:show, :update, :destroy]
 
       def index
-        @servicos = Servico.all
-        render json: @servicos
+        @servicos = Servico.includes(:categorias_servico).all
+        render json: @servicos, include: :categorias_servico
       end
 
       def show
@@ -45,7 +45,7 @@ module Api
       end
 
       def servico_params
-        params.require(:servico).permit(:nome,:valor)
+        params.require(:servico).permit(:nome, :valor, :tempo_servico, :categorias_servico_id)
       end
     end
   end

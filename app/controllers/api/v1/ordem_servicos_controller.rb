@@ -19,6 +19,17 @@ module Api
         else
           @ordem_servicos = OrdemServico.includes(:cliente, :tecnicos, :status, :prioridade).all
         end
+
+        # Filtro por mês na data_agendamento
+        if params[:mes].present? && params[:ano].present?
+          mes = params[:mes].to_i
+          ano = params[:ano].to_i
+          @ordem_servicos = @ordem_servicos.where(
+            "EXTRACT(MONTH FROM data_agendamento) = ? AND EXTRACT(YEAR FROM data_agendamento) = ?",
+            mes, ano
+          )
+        end
+
         render json: @ordem_servicos
       end
 
