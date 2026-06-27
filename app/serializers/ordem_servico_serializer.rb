@@ -7,8 +7,8 @@ class OrdemServicoSerializer < ActiveModel::Serializer
              :data_agendamento, :data_fechamento, :data_vencimento,
              :data_inicio_atendimento, :data_fim_atendimento,
              :created_at, :updated_at,
-             :cliente_id, :cliente_nome, :observacao, :custo_estimado, :valor_total, :notas,
-             :cliente, :tecnico_responsavel, :servicos, :equipamentos
+             :cliente_id, :endereco_id, :cliente_nome, :observacao, :custo_estimado, :valor_total, :notas,
+             :cliente, :endereco, :tecnico_responsavel, :servicos, :equipamentos
 
   def status_descricao
     object.status&.nome
@@ -25,12 +25,28 @@ class OrdemServicoSerializer < ActiveModel::Serializer
   def cliente
     c = object.cliente
     return nil unless c
+
     {
       id: c.id,
       nome: c.nome,
       email: c.try(:email),
       telefones: c.respond_to?(:telefones) ? c.telefones.map { |t| { id: t.id, numero: t.numero, tipo: t.try(:tipo) } } : [],
-      enderecos: c.respond_to?(:enderecos) ? c.enderecos.map { |e| { id: e.id, rua: e.try(:rua), numero: e.try(:numero), bairro: e.try(:bairro), cidade: e.try(:cidade), complemento: e.try(:complemento) } } : []
+      enderecos: c.respond_to?(:enderecos) ? c.enderecos.map { |e| { id: e.id, rua: e.try(:rua), numero: e.try(:numero), bairro: e.try(:bairro), cidade: e.try(:cidade), complemento: e.try(:complemento), cep: e.try(:cep) } } : []
+    }
+  end
+
+  def endereco
+    e = object.endereco
+    return nil unless e
+
+    {
+      id: e.id,
+      rua: e.try(:rua),
+      numero: e.try(:numero),
+      bairro: e.try(:bairro),
+      cidade: e.try(:cidade),
+      complemento: e.try(:complemento),
+      cep: e.try(:cep)
     }
   end
 
@@ -47,7 +63,8 @@ class OrdemServicoSerializer < ActiveModel::Serializer
       status_disponibilidade: t.try(:status_disponibilidade)
     }
   end
- def servicos
+
+  def servicos
     object.servicos.includes(:categorias_servico).map do |s|
       {
         id: s.id,
@@ -61,6 +78,7 @@ class OrdemServicoSerializer < ActiveModel::Serializer
       }
     end
   end
+
   def equipamentos
     object.os_equipamentos.includes(:equipamento).map do |oe|
       e = oe.equipamento

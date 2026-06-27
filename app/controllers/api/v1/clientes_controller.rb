@@ -16,22 +16,21 @@ module Api
       end
 
       def create
-        # Opcional: mapear os arrays simples para *_attributes
-        params[:cliente] ||= {}
-        params[:cliente][:enderecos_attributes] = params[:enderecos] if params[:enderecos]
-        params[:cliente][:telefones_attributes] = params[:telefones] if params[:telefones]
+        assign_nested_params
 
         cliente = Cliente.new(cliente_params)
         if cliente.save
-          render json: cliente.as_json(include: [:enderecos, :telefones]), status: :created
+          render_cliente(cliente, :created)
         else
           render json: cliente.errors, status: :unprocessable_entity
         end
       end
 
       def update
+        assign_nested_params
+
         if @cliente.update(cliente_params)
-          render json: @cliente
+          render_cliente(@cliente)
         else
           render json: @cliente.errors, status: :unprocessable_entity
         end
@@ -53,10 +52,20 @@ module Api
       def cliente_params
         params.require(:cliente).permit(
           :nome, :email, :data_registro, :data_ultima_visita,
-          enderecos_attributes: [:id, :rua, :numero, :bairro, :complemento, :cidade, :_destroy],
+          enderecos_attributes: [:id, :rua, :numero, :bairro, :complemento, :cep, :cidade, :_destroy],
           telefones_attributes: [:id, :numero, :tipo, :_destroy],
           equipamentos_attributes: [:id, :marca, :btus, :local_instalacao, :observacao, :_destroy]
         )
+      end
+
+      def assign_nested_params
+        params[:cliente] ||= {}
+        params[:cliente][:enderecos_attributes] = params[:enderecos] if params[:enderecos]
+        params[:cliente][:telefones_attributes] = params[:telefones] if params[:telefones]
+      end
+
+      def render_cliente(cliente, status = :ok)
+        render json: cliente.as_json(include: [:enderecos, :telefones]), status: status
       end
     end
   end
