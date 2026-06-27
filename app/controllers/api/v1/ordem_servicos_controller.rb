@@ -9,15 +9,15 @@ module Api
       def index
         # Se técnico autenticado, mostrar apenas suas OS
         if @current_user.role == 1 && @current_tecnico_id
-          @ordem_servicos = OrdemServico.includes(:cliente, :tecnicos, :status, :prioridade)
+          @ordem_servicos = OrdemServico.includes(:cliente, :endereco, :tecnicos, :status, :prioridade)
             .joins(:os_tecnicos)
             .where(os_tecnicos: { tecnico_id: @current_tecnico_id })
             .distinct
         elsif params[:cliente_id].present?
-          @ordem_servicos = OrdemServico.includes(:cliente, :tecnicos, :status, :prioridade)
+          @ordem_servicos = OrdemServico.includes(:cliente, :endereco, :tecnicos, :status, :prioridade)
             .where(cliente_id: params[:cliente_id])
         else
-          @ordem_servicos = OrdemServico.includes(:cliente, :tecnicos, :status, :prioridade).all
+          @ordem_servicos = OrdemServico.includes(:cliente, :endereco, :tecnicos, :status, :prioridade).all
         end
 
         # Filtro por mês na data_agendamento
@@ -168,6 +168,7 @@ module Api
           :data_vencimento,
           :custo_estimado,
           :cliente_id,
+          :endereco_id,
           :data_inicio_atendimento,
           :data_fim_atendimento,
           tecnico_ids: [],

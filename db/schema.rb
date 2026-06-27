@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_02_16_225724) do
+ActiveRecord::Schema[8.0].define(version: 2026_06_27_000100) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -38,6 +38,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_02_16_225724) do
     t.string "numero"
     t.string "bairro"
     t.string "complemento"
+    t.string "cep"
     t.index ["cliente_id"], name: "index_enderecos_on_cliente_id"
   end
 
@@ -69,7 +70,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_02_16_225724) do
     t.bigint "cliente_id"
     t.datetime "data_inicio_atendimento"
     t.datetime "data_fim_atendimento"
+    t.bigint "endereco_id"
     t.index ["cliente_id"], name: "index_ordem_servicos_on_cliente_id"
+    t.index ["endereco_id"], name: "index_ordem_servicos_on_endereco_id"
     t.index ["prioridade_id"], name: "index_ordem_servicos_on_prioridade_id"
     t.index ["status_id"], name: "index_ordem_servicos_on_status_id"
   end
@@ -168,6 +171,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_02_16_225724) do
   end
 
   add_foreign_key "ordem_servicos", "clientes"
+  add_foreign_key "ordem_servicos", "enderecos"
   add_foreign_key "servicos", "categorias_servicos"
   add_foreign_key "tarefas", "ordem_servicos"
   add_foreign_key "tarefas", "tecnicos"
