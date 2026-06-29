@@ -34,10 +34,15 @@ gem "thruster", require: false
 
 # Use Rack CORS for handling Cross-Origin Resource Sharing (CORS), making cross-origin Ajax possible
 gem "rack-cors"
-gem 'active_model_serializers', '~> 0.10.2'
-gem 'jwt'
+gem "active_model_serializers", "~> 0.10.2"
+gem "jwt"
 group :development, :test do
   gem "dotenv-rails"
+
+  gem "rspec-rails"
+  gem "rswag-api"
+  gem "rswag-ui"
+  gem "rswag-specs"
 
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
   gem "debug", platforms: %i[ mri windows ], require: "debug/prelude"
