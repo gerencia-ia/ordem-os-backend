@@ -36,12 +36,14 @@ gem "thruster", require: false
 gem "rack-cors"
 gem "active_model_serializers", "~> 0.10.2"
 gem "jwt"
+
+gem "rswag-api"
+gem "rswag-ui"
+
 group :development, :test do
   gem "dotenv-rails"
 
   gem "rspec-rails"
-  gem "rswag-api"
-  gem "rswag-ui"
   gem "rswag-specs"
 
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
