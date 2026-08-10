@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_06_27_000100) do
+ActiveRecord::Schema[8.0].define(version: 2026_08_08_000000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -170,9 +170,20 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_27_000100) do
     t.index ["cpf"], name: "index_users_on_cpf", unique: true
   end
 
+  add_foreign_key "enderecos", "clientes"
+  add_foreign_key "equipamentos", "clientes"
   add_foreign_key "ordem_servicos", "clientes"
   add_foreign_key "ordem_servicos", "enderecos"
+  add_foreign_key "ordem_servicos", "prioridades"
+  add_foreign_key "ordem_servicos", "status"
+  add_foreign_key "os_equipamentos", "equipamentos"
+  add_foreign_key "os_equipamentos", "ordem_servicos"
+  add_foreign_key "os_servicos", "ordem_servicos"
+  add_foreign_key "os_servicos", "servicos"
+  add_foreign_key "os_tecnicos", "ordem_servicos"
+  add_foreign_key "os_tecnicos", "tecnicos"
   add_foreign_key "servicos", "categorias_servicos"
   add_foreign_key "tarefas", "ordem_servicos"
   add_foreign_key "tarefas", "tecnicos"
+  add_foreign_key "telefones", "clientes"
 end
