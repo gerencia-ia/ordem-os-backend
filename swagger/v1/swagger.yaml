@@ -1,0 +1,21 @@
+---
+openapi: 3.0.1
+info:
+  title: Ordem OS API
+  version: v1
+  description: |
+    API REST para gerenciamento de Ordens de Serviço.
+
+    ## Recursos
+
+    - Autenticação JWT
+    - Clientes
+    - Equipamentos
+    - Técnicos
+    - Ordens de Serviço
+    - Serviços
+
+    Desenvolvida em Ruby on Rails 8.
+paths: {}
+servers:
+- url: https://ordem-os-backend.onrender.com/

@@ -16,9 +16,9 @@ gem "bcrypt", "~> 3.1.7"
 gem "tzinfo-data", platforms: %i[ windows jruby ]
 
 # Use the database-backed adapters for Rails.cache, Active Job, and Action Cable
-gem "solid_cache"
-gem "solid_queue"
-gem "solid_cable"
+# gem "solid_cache"
+# gem "solid_queue"
+# gem "solid_cable"
 
 # Reduces boot times through caching; required in config/boot.rb
 gem "bootsnap", require: false
@@ -34,10 +34,17 @@ gem "thruster", require: false
 
 # Use Rack CORS for handling Cross-Origin Resource Sharing (CORS), making cross-origin Ajax possible
 gem "rack-cors"
-gem 'active_model_serializers', '~> 0.10.2'
-gem 'jwt'
+gem "active_model_serializers", "~> 0.10.2"
+gem "jwt"
+
+gem "rswag-api"
+gem "rswag-ui"
+
 group :development, :test do
   gem "dotenv-rails"
+
+  gem "rspec-rails"
+  gem "rswag-specs"
 
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
   gem "debug", platforms: %i[ mri windows ], require: "debug/prelude"
