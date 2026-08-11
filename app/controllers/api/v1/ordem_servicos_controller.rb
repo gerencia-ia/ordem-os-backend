@@ -3,7 +3,7 @@
 module Api
   module V1
     class OrdemServicosController < BaseController
-      before_action :set_ordem_servico, only: [:show, :update, :destroy, :update_status, :update_laudo, :add_servico, :remove_servico, :add_tecnico, :remove_tecnico]
+      before_action :set_ordem_servico, only: [ :show, :update, :destroy, :update_status, :update_laudo, :add_servico, :remove_servico, :add_tecnico, :remove_tecnico ]
       # Exemplo: apenas SECRETARIA pode criar e remover ordens
 
       def index
@@ -72,14 +72,14 @@ module Api
       # Atualiza o laudo de um equipamento específico na OS
       def update_laudo
         os_equipamento = @ordem_servico.os_equipamentos.find_by(equipamento_id: params[:equipamento_id])
-        
+
         if os_equipamento.nil?
           render json: { error: "Equipamento não encontrado nesta ordem de serviço" }, status: :not_found
           return
         end
 
         if os_equipamento.update(laudo: params[:laudo])
-          render json: { 
+          render json: {
             id: os_equipamento.id,
             equipamento_id: os_equipamento.equipamento_id,
             laudo: os_equipamento.laudo,
@@ -174,7 +174,7 @@ module Api
           tecnico_ids: [],
           servico_ids: [],
           equipamento_ids: [],
-          os_equipamentos_attributes: [:id, :equipamento_id, :laudo, :_destroy]
+          os_equipamentos_attributes: [ :id, :equipamento_id, :laudo, :_destroy ]
         )
       end
     end
