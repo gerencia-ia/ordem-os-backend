@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_08_08_000000) do
+ActiveRecord::Schema[8.0].define(version: 2026_08_10_224809) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -112,6 +112,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_08_08_000000) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "roles", force: :cascade do |t|
+    t.string "nome"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "servicos", force: :cascade do |t|
     t.string "nome"
     t.decimal "valor"
@@ -166,8 +172,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_08_08_000000) do
     t.string "password_digest", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.integer "role", default: 0, null: false
+    t.integer "role_id", default: 0, null: false
     t.index ["cpf"], name: "index_users_on_cpf", unique: true
+    t.index ["role_id"], name: "index_users_on_role_id"
   end
 
   add_foreign_key "enderecos", "clientes"
@@ -186,4 +193,5 @@ ActiveRecord::Schema[8.0].define(version: 2026_08_08_000000) do
   add_foreign_key "tarefas", "ordem_servicos"
   add_foreign_key "tarefas", "tecnicos"
   add_foreign_key "telefones", "clientes"
+  add_foreign_key "users", "roles"
 end
