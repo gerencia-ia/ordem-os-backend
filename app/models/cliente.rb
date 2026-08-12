@@ -18,13 +18,13 @@ class Cliente < ApplicationRecord
 
   def deve_ter_ao_menos_um_endereco
     if enderecos.reject(&:marked_for_destruction?).blank?
-      errors.add(:enderecos, 'deve conter ao menos um endereço')
+      errors.add(:enderecos, "deve conter ao menos um endereço")
     end
   end
 
   def deve_ter_ao_menos_um_telefone
     if telephones_collection_blank?
-      errors.add(:telefones, 'deve conter ao menos um telefone')
+      errors.add(:telefones, "deve conter ao menos um telefone")
     end
   end
 

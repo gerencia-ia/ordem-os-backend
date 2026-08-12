@@ -28,6 +28,6 @@ class OrdemServico < ApplicationRecord
     return if cliente.blank? || endereco.blank?
     return if endereco.cliente_id == cliente_id
 
-    errors.add(:endereco_id, 'deve pertencer ao mesmo cliente da ordem de servico')
+    errors.add(:endereco_id, "deve pertencer ao mesmo cliente da ordem de servico")
   end
 end
