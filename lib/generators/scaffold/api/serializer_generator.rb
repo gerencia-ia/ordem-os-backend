@@ -1,14 +1,18 @@
 # frozen_string_literal: true
 
-module Scaffold
-  module Api
-    class SerializerGenerator < Rails::Generators::NamedBase
-      source_root File.expand_path("templates", __dir__)
+require "rails/generators"
 
-      argument :attributes, type: :array, default: []
+module Generators
+  module Scaffold
+    module Api
+      class SerializerGenerator < Rails::Generators::NamedBase
+        source_root File.expand_path("templates", __dir__)
 
-      def generate_serializer
-        template "serializer.rb.tt", "app/serializers/#{file_name}_serializer.rb"
+        argument :attributes, type: :array, default: []
+
+        def generate_serializer
+          template "serializer.rb.tt", "app/serializers/#{file_name}_serializer.rb"
+        end
       end
     end
   end
