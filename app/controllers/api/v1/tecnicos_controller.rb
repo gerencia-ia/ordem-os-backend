@@ -2,7 +2,7 @@
 
 module Api
   module V1
-    class TecnicosController < ApplicationController
+    class TecnicosController < BaseController
       before_action :set_tecnico, only: [:show, :update, :destroy]
 
       def index

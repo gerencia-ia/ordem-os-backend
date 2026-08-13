@@ -2,7 +2,7 @@
 
 module Api
   module V1
-    class StatusController < ApplicationController
+    class StatusController < BaseController
       before_action :set_status, only: [:show, :update, :destroy]
 
       def index

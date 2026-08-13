@@ -16,19 +16,18 @@ Rails.application.routes.draw do
       resources :categorias_servico
       resources :status
       resources :tecnicos
-        resources :ordem_servicos do
-          member do
-            patch :update_status
-            patch "equipamentos/:equipamento_id/laudo", to: "ordem_servicos#update_laudo"
-            post "servicos", to: "ordem_servicos#add_servico"
-            delete "servicos/:servico_id", to: "ordem_servicos#remove_servico"
-            post "tecnicos", to: "ordem_servicos#add_tecnico"
-            delete "tecnicos/:tecnico_id", to: "ordem_servicos#remove_tecnico"
-          end
+      resources :ordem_servicos do
+        member do
+          patch :update_status
+          patch "equipamentos/:equipamento_id/laudo", to: "ordem_servicos#update_laudo"
+          post "servicos", to: "ordem_servicos#add_servico"
+          delete "servicos/:servico_id", to: "ordem_servicos#remove_servico"
+          post "tecnicos", to: "ordem_servicos#add_tecnico"
+          delete "tecnicos/:tecnico_id", to: "ordem_servicos#remove_tecnico"
         end
+      end
       resources :prioridades
       post "login", to: "sessions#create"
-      get "login/demo", to: "sessions#demo" if Rails.env.development?
 
       # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 

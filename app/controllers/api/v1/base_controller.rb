@@ -14,14 +14,13 @@ module Api
           secret = Rails.application.credentials.secret_key_base || Rails.application.secret_key_base
           decoded = JWT.decode(header, secret)[0]
           @current_user = User.find(decoded['user_id'])
-          @current_tecnico_id = decoded['tecnico_id']
         rescue
           render json: { error: 'Não autorizado' }, status: :unauthorized
         end
       end
 
-      def require_role!(*roles)
-        unless roles.include?(@current_user.role)
+      def require_role!(role)
+        if (role === @current_user.role)
           render json: { error: 'Acesso negado' }, status: :forbidden
         end
       end

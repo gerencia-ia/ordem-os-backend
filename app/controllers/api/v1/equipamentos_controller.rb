@@ -2,7 +2,7 @@
 
 module Api
   module V1
-    class EquipamentosController < ApplicationController
+    class EquipamentosController < BaseController
       before_action :set_equipamento, only: [:show, :update, :destroy, :historico_laudos]
 
       def index

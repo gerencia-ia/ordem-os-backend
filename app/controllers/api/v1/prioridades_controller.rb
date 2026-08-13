@@ -2,7 +2,7 @@
 
 module Api
   module V1
-    class PrioridadesController < ApplicationController
+    class PrioridadesController < BaseController
       before_action :set_prioridade, only: [:show, :update, :destroy]
 
       def index
