@@ -27,11 +27,11 @@ equipamento_2 = Equipamento.find_by!(
   marca: "LG"
 )
 
-tecnico_1 = Tecnico.find_by!(
-  cpf: "33333333333"
+user_1 = User.find_by!(
+  cpf: "22222222222"
 )
 
-tecnico_2 = Tecnico.find_by!(
+user_2 = User.find_by!(
   cpf: "44444444444"
 )
 
@@ -149,12 +149,12 @@ end
 
 OsTecnico.find_or_create_by!(
   ordem_servico: ordem_1,
-  tecnico: tecnico_1
+  user: user_1
 )
 
 OsTecnico.find_or_create_by!(
   ordem_servico: ordem_2,
-  tecnico: tecnico_2
+  user: user_2
 )
 
 # ============================================================
@@ -166,7 +166,7 @@ Tarefa.find_or_create_by!(
   descricao: "Realizar limpeza do equipamento"
 ) do |tarefa|
   tarefa.status = "nao_iniciada"
-  tarefa.tecnico = tecnico_1
+  tarefa.user = user_1
 end
 
 Tarefa.find_or_create_by!(
@@ -174,7 +174,7 @@ Tarefa.find_or_create_by!(
   descricao: "Verificar funcionamento"
 ) do |tarefa|
   tarefa.status = "nao_iniciada"
-  tarefa.tecnico = tecnico_1
+  tarefa.user = user_1
 end
 
 Tarefa.find_or_create_by!(
@@ -182,7 +182,7 @@ Tarefa.find_or_create_by!(
   descricao: "Diagnosticar falha no equipamento"
 ) do |tarefa|
   tarefa.status = "em_andamento"
-  tarefa.tecnico = tecnico_2
+  tarefa.user = user_2
   tarefa.data_inicio = Time.current
 end
 

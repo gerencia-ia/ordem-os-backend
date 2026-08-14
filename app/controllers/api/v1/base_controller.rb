@@ -20,7 +20,7 @@ module Api
       end
 
       def require_role!(role)
-        if (role === @current_user.role)
+        if (role === @current_user.role.nome)
           render json: { error: 'Acesso negado' }, status: :forbidden
         end
       end

@@ -8,16 +8,16 @@ module Api
 
       def index
         # Se técnico autenticado, mostrar apenas suas OS
-        if @current_user.role == 1 && @current_tecnico_id
-          @ordem_servicos = OrdemServico.includes(:cliente, :endereco, :tecnicos, :status, :prioridade)
+        if @current_user.role.id == 2
+          @ordem_servicos = OrdemServico.includes(:cliente, :endereco, :users, :status, :prioridade)
             .joins(:os_tecnicos)
-            .where(os_tecnicos: { tecnico_id: @current_tecnico_id })
+            .where(os_tecnicos: { user_id: @current_user.id })
             .distinct
         elsif params[:cliente_id].present?
-          @ordem_servicos = OrdemServico.includes(:cliente, :endereco, :tecnicos, :status, :prioridade)
+          @ordem_servicos = OrdemServico.includes(:cliente, :endereco, :users, :status, :prioridade)
             .where(cliente_id: params[:cliente_id])
         else
-          @ordem_servicos = OrdemServico.includes(:cliente, :endereco, :tecnicos, :status, :prioridade).all
+          @ordem_servicos = OrdemServico.includes(:cliente, :endereco, :users, :status, :prioridade).all
         end
 
         # Filtro por mês na data_agendamento
@@ -121,17 +121,17 @@ module Api
 
       # Adiciona um técnico à ordem de serviço (via os_tecnicos)
       def add_tecnico
-        tecnico = Tecnico.find_by(id: params[:tecnico_id])
-        return render json: { error: "Técnico não encontrado" }, status: :not_found unless tecnico
+        user = User.find_by(id: params[:user_id])
+        return render json: { error: "Técnico não encontrado" }, status: :not_found unless user
 
-        os_tecnico = @ordem_servico.os_tecnicos.find_or_initialize_by(tecnico_id: tecnico.id)
+        os_tecnico = @ordem_servico.os_tecnicos.find_or_initialize_by(user_id: user.id)
 
         if os_tecnico.persisted?
-          return render json: { id: os_tecnico.id, ordem_servico_id: @ordem_servico.id, tecnico_id: tecnico.id }, status: :ok
+          return render json: { id: os_tecnico.id, ordem_servico_id: @ordem_servico.id, user_id: user.id }, status: :ok
         end
 
         if os_tecnico.save
-          render json: { id: os_tecnico.id, ordem_servico_id: @ordem_servico.id, tecnico_id: tecnico.id }, status: :created
+          render json: { id: os_tecnico.id, ordem_servico_id: @ordem_servico.id, user_id: user.id }, status: :created
         else
           render json: os_tecnico.errors, status: :unprocessable_entity
         end
@@ -139,7 +139,7 @@ module Api
 
       # Remove um técnico da ordem de serviço (via os_tecnicos)
       def remove_tecnico
-        os_tecnico = @ordem_servico.os_tecnicos.find_by(tecnico_id: params[:tecnico_id])
+        os_tecnico = @ordem_servico.os_tecnicos.find_by(user_id: params[:user_id])
         return render json: { error: "Técnico não associado à ordem de serviço" }, status: :not_found unless os_tecnico
 
         os_tecnico.destroy
@@ -171,7 +171,7 @@ module Api
           :endereco_id,
           :data_inicio_atendimento,
           :data_fim_atendimento,
-          tecnico_ids: [],
+          user_ids: [],
           servico_ids: [],
           equipamento_ids: [],
           os_equipamentos_attributes: [ :id, :equipamento_id, :laudo, :_destroy ]
