@@ -8,8 +8,8 @@ module Api
         if user&.authenticate(params[:senha])
 
           secret = Rails.application.credentials.secret_key_base || Rails.application.secret_key_base
-          payload = { user_id: user.id }
-                    
+          payload = { user_id: user.id, nome: user.nome, cpf: user.cpf, role: user.role.nome }
+          
           token = JWT.encode(payload, secret)
           response = { token: token }
 
