@@ -8,7 +8,7 @@ class OrdemServicoSerializer < ActiveModel::Serializer
              :data_inicio_atendimento, :data_fim_atendimento,
              :created_at, :updated_at,
              :cliente_id, :endereco_id, :cliente_nome, :observacao, :custo_estimado, :valor_total, :notas,
-             :cliente, :endereco, :tecnico_responsavel, :servicos, :equipamentos
+             :cliente, :endereco, :tecnicos, :servicos, :equipamentos
 
   def status_descricao
     object.status&.nome
@@ -50,17 +50,17 @@ class OrdemServicoSerializer < ActiveModel::Serializer
     }
   end
 
-  def tecnico_responsavel
+  def tecnicos
     # Considera o primeiro técnico relacionado como responsável, se houver
-    t = object.tecnicos&.first
+    t = object.users&.first
     return nil unless t
     {
       id: t.id,
       nome: t.nome,
+      cpf: t.try(:cpf),
       email: t.try(:email),
       telefone: t.try(:telefone),
-      especialidades: t.try(:especialidades),
-      status_disponibilidade: t.try(:status_disponibilidade)
+      role: t.try(:role)
     }
   end
 

@@ -15,7 +15,6 @@ Rails.application.routes.draw do
       resources :servicos
       resources :categorias_servico
       resources :status
-      resources :tecnicos
       resources :ordem_servicos do
         member do
           patch :update_status
@@ -23,7 +22,7 @@ Rails.application.routes.draw do
           post "servicos", to: "ordem_servicos#add_servico"
           delete "servicos/:servico_id", to: "ordem_servicos#remove_servico"
           post "tecnicos", to: "ordem_servicos#add_tecnico"
-          delete "tecnicos/:tecnico_id", to: "ordem_servicos#remove_tecnico"
+          delete "tecnicos/:user_id", to: "ordem_servicos#remove_tecnico"
         end
       end
       resources :prioridades

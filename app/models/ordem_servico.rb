@@ -7,7 +7,7 @@ class OrdemServico < ApplicationRecord
   belongs_to :endereco, foreign_key: :endereco_id, optional: true, inverse_of: :ordem_servicos
 
   has_many :os_tecnicos, foreign_key: :ordem_servico_id, dependent: :destroy, inverse_of: :ordem_servico
-  has_many :tecnicos, through: :os_tecnicos, source: :tecnico
+  has_many :users, through: :os_tecnicos, source: :user
 
   has_many :os_servicos, foreign_key: :ordem_servico_id, dependent: :destroy, inverse_of: :ordem_servico
   has_many :servicos, through: :os_servicos, source: :servico
