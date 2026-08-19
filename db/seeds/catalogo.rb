@@ -8,6 +8,7 @@ puts "Criando catálogo..."
 
 [
   "Aberta",
+  "Não iniciada",
   "Em andamento",
   "Aguardando",
   "Concluída",
