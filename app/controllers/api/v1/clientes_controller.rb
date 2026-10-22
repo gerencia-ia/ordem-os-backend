@@ -2,17 +2,17 @@
 
 module Api
   module V1
-    class ClientesController < ApplicationController
-      before_action :set_cliente, only: [:show, :update, :destroy]
+    class ClientesController < BaseController
+      before_action :set_cliente, only: [ :show, :update, :destroy ]
 
       def index
         clientes = Cliente.includes(:telefones, :enderecos).all
-        render json: clientes.as_json(include: [:telefones, :enderecos])
+        render json: clientes.as_json(include: [ :telefones, :enderecos ])
       end
 
       def show
         cliente = Cliente.includes(:telefones, :enderecos).find(params[:id])
-        render json: cliente.as_json(include: [:telefones, :enderecos])
+        render json: cliente.as_json(include: [ :telefones, :enderecos ])
       end
 
       def create
@@ -52,9 +52,9 @@ module Api
       def cliente_params
         params.require(:cliente).permit(
           :nome, :email, :data_registro, :data_ultima_visita,
-          enderecos_attributes: [:id, :rua, :numero, :bairro, :complemento, :cep, :cidade, :_destroy],
-          telefones_attributes: [:id, :numero, :tipo, :_destroy],
-          equipamentos_attributes: [:id, :marca, :btus, :local_instalacao, :observacao, :_destroy]
+          enderecos_attributes: [ :id, :rua, :numero, :bairro, :complemento, :cep, :cidade, :_destroy ],
+          telefones_attributes: [ :id, :numero, :tipo, :_destroy ],
+          equipamentos_attributes: [ :id, :marca, :btus, :local_instalacao, :observacao, :_destroy ]
         )
       end
 
@@ -65,7 +65,7 @@ module Api
       end
 
       def render_cliente(cliente, status = :ok)
-        render json: cliente.as_json(include: [:enderecos, :telefones]), status: status
+        render json: cliente.as_json(include: [ :enderecos, :telefones ]), status: status
       end
     end
   end

@@ -2,7 +2,7 @@
 
 module Api
   module V1
-    class ServicosController < ApplicationController
+    class ServicosController < BaseController
       before_action :set_servico, only: [:show, :update, :destroy]
 
       def index

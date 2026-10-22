@@ -17,12 +17,12 @@ class AddMissingForeignKeys < ActiveRecord::Migration[8.0]
     add_foreign_key :os_servicos, :ordem_servicos, if_not_exists: true
 
     add_foreign_key :os_tecnicos, :ordem_servicos, if_not_exists: true
-    add_foreign_key :os_tecnicos, :tecnicos, if_not_exists: true
+    add_foreign_key :os_tecnicos, :users, if_not_exists: true
 
     add_foreign_key :servicos, :categorias_servicos, if_not_exists: true
 
     add_foreign_key :tarefas, :ordem_servicos, if_not_exists: true
-    add_foreign_key :tarefas, :tecnicos, if_not_exists: true
+    add_foreign_key :tarefas, :users, if_not_exists: true
 
     add_foreign_key :telefones, :clientes, if_not_exists: true
   end

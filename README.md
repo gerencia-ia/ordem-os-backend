@@ -49,7 +49,7 @@ Arquivos principais:
 Controla os profissionais responsáveis pela execução do atendimento.
 
 Arquivos principais:
-- app/models/tecnico.rb
+- app/models/user.rb
 - app/models/os_tecnico.rb
 - app/controllers/api/v1/tecnicos_controller.rb
 

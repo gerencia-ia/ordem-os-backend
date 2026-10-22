@@ -1,25 +1,32 @@
 # frozen_string_literal: true
 
 class OrdemServicoSerializer < ActiveModel::Serializer
-  attributes :id, :numero_ordem, :descricao, :tipo_servico,
-             :status_id, :status_descricao,
-             :prioridade_id, :prioridade_descricao,
-             :data_agendamento, :data_fechamento, :data_vencimento,
+  attributes :id, :numero_ordem, :descricao,
+             :status, :prioridade, :data_agendamento, 
+             :data_fechamento, :data_vencimento,
              :data_inicio_atendimento, :data_fim_atendimento,
-             :created_at, :updated_at,
-             :cliente_id, :endereco_id, :cliente_nome, :observacao, :custo_estimado, :valor_total, :notas,
-             :cliente, :endereco, :tecnico_responsavel, :servicos, :equipamentos
+             :observacao, :custo_estimado, :valor_total,
+             :cliente, :endereco, :tecnicos, :servicos, :equipamentos,
+             :created_at, :updated_at
 
-  def status_descricao
-    object.status&.nome
+  def status
+    s = object.status
+    return nil unless s
+
+    {
+      id: s.id,
+      nome: s.nome
+    }
   end
 
-  def prioridade_descricao
-    object.prioridade&.descricao
-  end
+  def prioridade
+    p = object.prioridade
+    return nil unless p
 
-  def cliente_nome
-    object.cliente&.nome
+    {
+      id: p.id,
+      nome: p.descricao
+    }
   end
 
   def cliente
@@ -50,17 +57,17 @@ class OrdemServicoSerializer < ActiveModel::Serializer
     }
   end
 
-  def tecnico_responsavel
+  def tecnicos
     # Considera o primeiro técnico relacionado como responsável, se houver
-    t = object.tecnicos&.first
+    t = object.users&.first
     return nil unless t
     {
       id: t.id,
       nome: t.nome,
+      cpf: t.try(:cpf),
       email: t.try(:email),
       telefone: t.try(:telefone),
-      especialidades: t.try(:especialidades),
-      status_disponibilidade: t.try(:status_disponibilidade)
+      role: t.role ? { id: t.role.id, nome: t.role.nome } : nil
     }
   end
 
@@ -90,9 +97,5 @@ class OrdemServicoSerializer < ActiveModel::Serializer
         laudo: oe.laudo
       }
     end
-  end
-
-  def notas
-    object.try(:notas)
   end
 end

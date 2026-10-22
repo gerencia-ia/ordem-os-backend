@@ -27,16 +27,20 @@ equipamento_2 = Equipamento.find_by!(
   marca: "LG"
 )
 
-tecnico_1 = Tecnico.find_by!(
-  cpf: "33333333333"
+user_1 = User.find_by!(
+  cpf: "22222222222"
 )
 
-tecnico_2 = Tecnico.find_by!(
+user_2 = User.find_by!(
   cpf: "44444444444"
 )
 
 status_aberta = Status.find_by!(
   nome: "Aberta"
+)
+
+status_nao_iniciada = Status.find_by!(
+  nome: "Não iniciada"
 )
 
 status_andamento = Status.find_by!(
@@ -76,7 +80,6 @@ ordem_1 = OrdemServico.find_or_create_by!(
 
   os.descricao = "Manutenção preventiva do ar-condicionado."
   os.observacao = "Cliente solicitou atendimento no período da manhã."
-  os.tipo_servico = "Manutenção"
 
   os.custo_estimado = 180.00
   os.valor_total = 180.00
@@ -99,7 +102,6 @@ ordem_2 = OrdemServico.find_or_create_by!(
 
   os.descricao = "Equipamento não está resfriando corretamente."
   os.observacao = "Verificar compressor e gás refrigerante."
-  os.tipo_servico = "Reparo"
 
   os.custo_estimado = 250.00
   os.valor_total = 250.00
@@ -149,12 +151,12 @@ end
 
 OsTecnico.find_or_create_by!(
   ordem_servico: ordem_1,
-  tecnico: tecnico_1
+  user: user_1
 )
 
 OsTecnico.find_or_create_by!(
   ordem_servico: ordem_2,
-  tecnico: tecnico_2
+  user: user_2
 )
 
 # ============================================================
@@ -165,24 +167,24 @@ Tarefa.find_or_create_by!(
   ordem_servico: ordem_1,
   descricao: "Realizar limpeza do equipamento"
 ) do |tarefa|
-  tarefa.status = "nao_iniciada"
-  tarefa.tecnico = tecnico_1
+  tarefa.status = status_nao_iniciada
+  tarefa.user = user_1
 end
 
 Tarefa.find_or_create_by!(
   ordem_servico: ordem_1,
   descricao: "Verificar funcionamento"
 ) do |tarefa|
-  tarefa.status = "nao_iniciada"
-  tarefa.tecnico = tecnico_1
+  tarefa.status = status_nao_iniciada
+  tarefa.user = user_1
 end
 
 Tarefa.find_or_create_by!(
   ordem_servico: ordem_2,
   descricao: "Diagnosticar falha no equipamento"
 ) do |tarefa|
-  tarefa.status = "em_andamento"
-  tarefa.tecnico = tecnico_2
+  tarefa.status = status_andamento
+  tarefa.user = user_2
   tarefa.data_inicio = Time.current
 end
 

@@ -2,7 +2,7 @@
 
 module Api
   module V1
-    class CategoriasServicoController < ApplicationController
+    class CategoriasServicoController < BaseController
       before_action :set_categoria, only: [:show, :update, :destroy]
 
       def index
