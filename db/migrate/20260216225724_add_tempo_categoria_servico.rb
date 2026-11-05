@@ -7,7 +7,7 @@ class AddTempoCategoriaServico < ActiveRecord::Migration[8.0]
     end
 
     add_column :servicos, :tempo_servico, :integer
-    
+
     # O Rails vai procurar a tabela 'categorias_servicos' automaticamente
     # e criar a coluna 'categorias_servico_id'
     add_reference :servicos, :categorias_servico, foreign_key: true

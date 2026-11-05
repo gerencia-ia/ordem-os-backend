@@ -7,7 +7,6 @@ class CreateUsers < ActiveRecord::Migration[7.0]
       t.string :telefone
       t.bigint :role_id
       t.string :senha_digest, null: false
-
       t.timestamps
     end
 
