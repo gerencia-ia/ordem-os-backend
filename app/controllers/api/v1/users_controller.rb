@@ -56,13 +56,19 @@ module Api
       end
 
       def user_params
-        params.require(:user).permit(
+        data = params[:user] || params
+        p = data.permit(
           :nome,
           :cpf,
           :email,
           :telefone,
-          :role_id
+          :role_id,
+          :password,
+          :senha
         )
+        p[:password] = p.delete(:senha) if p[:senha].present?
+        p.delete(:password) if p[:password].blank?
+        p
       end
     end
   end
