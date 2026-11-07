@@ -56,7 +56,9 @@ module Api
       end
 
       def user_params
-        data = params[:user] || params
+        raw_password = params[:user]&.dig(:password) || params[:user]&.dig(:senha) || params[:password] || params[:senha]
+        data = params[:user].present? ? params.require(:user) : params
+
         p = data.permit(
           :nome,
           :cpf,
@@ -66,8 +68,14 @@ module Api
           :password,
           :senha
         )
-        p[:password] = p.delete(:senha) if p[:senha].present?
+
+        p[:password] = raw_password if raw_password.present?
+        p.delete(:senha)
         p.delete(:password) if p[:password].blank?
+
+        p[:cpf] = p[:cpf].gsub(/\D/, "") if p[:cpf].present?
+        p[:telefone] = p[:telefone].gsub(/\D/, "") if p[:telefone].present?
+
         p
       end
     end
