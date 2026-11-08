@@ -9,7 +9,7 @@ module Api
         authorize! Equipamento
 
         if params[:cliente_id].present?
-          @equipamentos = Equipamento.where(cliente_id: params[:cliente_id])
+          @equipamentos = Equipamento.por_cliente(params[:cliente_id])
         else
           @equipamentos = Equipamento.all
         end

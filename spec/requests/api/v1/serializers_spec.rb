@@ -68,7 +68,7 @@ RSpec.describe "Serializers Standardization", type: :request do
     Servico.create!(
       nome: "Higienização Química",
       valor: 250.0,
-      tempo_servico: "01:30:00",
+      tempo_servico: 90,
       categorias_servico: categoria
     )
   end

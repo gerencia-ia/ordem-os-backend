@@ -20,19 +20,8 @@ module Api
           )
         )
 
-        if params[:cliente_id].present?
-          @ordem_servicos = @ordem_servicos.where(cliente_id: params[:cliente_id])
-        end
-
-        # Filtro por mês e ano na data_agendamento
-        if params[:mes].present? && params[:ano].present?
-          mes = params[:mes].to_i
-          ano = params[:ano].to_i
-          @ordem_servicos = @ordem_servicos.where(
-            "EXTRACT(MONTH FROM data_agendamento) = ? AND EXTRACT(YEAR FROM data_agendamento) = ?",
-            mes, ano
-          )
-        end
+        @ordem_servicos = @ordem_servicos.por_cliente(params[:cliente_id]) if params[:cliente_id].present?
+        @ordem_servicos = @ordem_servicos.por_mes_e_ano(params[:mes], params[:ano]) if params[:mes].present? && params[:ano].present?
 
         render json: @ordem_servicos
       end

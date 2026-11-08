@@ -1489,8 +1489,9 @@ paths:
                       type: string
                       example: '220.00'
                     tempo_servico:
-                      type: string
-                      example: '01:30:00'
+                      type: integer
+                      example: 90
+                      description: Tempo estimado em minutos
                     categorias_servico_id:
                       type: integer
                       example: 1
@@ -1540,8 +1541,9 @@ paths:
                       type: string
                       example: '350.00'
                     tempo_servico:
-                      type: string
-                      example: '01:00:00'
+                      type: integer
+                      example: 60
+                      description: Tempo estimado em minutos
                     categorias_servico_id:
                       type: integer
                       example: 2
@@ -1607,8 +1609,9 @@ paths:
                       type: string
                       example: '380.00'
                     tempo_servico:
-                      type: string
-                      example: '01:15:00'
+                      type: integer
+                      example: 75
+                      description: Tempo estimado em minutos
     delete:
       summary: Remove um serviço do catálogo
       tags:

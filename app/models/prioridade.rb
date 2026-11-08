@@ -1,7 +1,9 @@
 # frozen_string_literal: true
 
 class Prioridade < ApplicationRecord
-  has_many :ordem_servicos, foreign_key: :prioridade_id, dependent: :restrict_with_error, inverse_of: :prioridade
+  normalizes :descricao, with: ->(d) { d.to_s.strip }
 
-  validates :descricao, presence: true
+  has_many :ordem_servicos, dependent: :restrict_with_error, inverse_of: :prioridade
+
+  validates :descricao, presence: true, uniqueness: { case_sensitive: false }
 end

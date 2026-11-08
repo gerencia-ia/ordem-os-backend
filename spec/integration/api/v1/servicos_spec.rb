@@ -18,7 +18,7 @@ RSpec.describe "Serviços API", type: :request, swagger_doc: "v1/swagger.yaml" d
               id: { type: :integer, example: 1 },
               nome: { type: :string, example: "Higienização Química de Split até 18.000 BTUs" },
               valor: { type: :string, example: "220.00" },
-              tempo_servico: { type: :string, example: "01:30:00" },
+              tempo_servico: { type: :integer, example: 90, description: "Tempo estimado em minutos" },
               categorias_servico_id: { type: :integer, example: 1 },
               categorias_servico: {
                 type: :object,
@@ -48,7 +48,7 @@ RSpec.describe "Serviços API", type: :request, swagger_doc: "v1/swagger.yaml" d
             properties: {
               nome: { type: :string, example: "Carga de Gás Refrigerante R410A" },
               valor: { type: :string, example: "350.00" },
-              tempo_servico: { type: :string, example: "01:00:00" },
+              tempo_servico: { type: :integer, example: 60, description: "Tempo estimado em minutos" },
               categorias_servico_id: { type: :integer, example: 2 }
             },
             required: %w[nome valor categorias_servico_id]
@@ -102,7 +102,7 @@ RSpec.describe "Serviços API", type: :request, swagger_doc: "v1/swagger.yaml" d
             properties: {
               nome: { type: :string, example: "Carga de Gás R410A (até 30.000 BTUs)" },
               valor: { type: :string, example: "380.00" },
-              tempo_servico: { type: :string, example: "01:15:00" }
+              tempo_servico: { type: :integer, example: 75, description: "Tempo estimado em minutos" }
             }
           }
         }
