@@ -22,7 +22,7 @@ module Api
         if @servico.save
           render json: @servico, status: :created
         else
-          render json: @servico.errors, status: :unprocessable_entity
+          render_validation_errors(@servico)
         end
       end
 
@@ -31,7 +31,7 @@ module Api
         if @servico.update(servico_params)
           render json: @servico
         else
-          render json: @servico.errors, status: :unprocessable_entity
+          render_validation_errors(@servico)
         end
       end
 

@@ -22,7 +22,7 @@ module Api
         if @categoria.save
           render json: @categoria, status: :created
         else
-          render json: @categoria.errors, status: :unprocessable_entity
+          render_validation_errors(@categoria)
         end
       end
 
@@ -31,7 +31,7 @@ module Api
         if @categoria.update(categoria_params)
           render json: @categoria
         else
-          render json: @categoria.errors, status: :unprocessable_entity
+          render_validation_errors(@categoria)
         end
       end
 

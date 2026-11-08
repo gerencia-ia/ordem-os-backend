@@ -27,7 +27,7 @@ module Api
         if @equipamento.save
           render json: @equipamento, status: :created
         else
-          render json: @equipamento.errors, status: :unprocessable_entity
+          render_validation_errors(@equipamento)
         end
       end
 
@@ -36,7 +36,7 @@ module Api
         if @equipamento.update(equipamento_params)
           render json: @equipamento
         else
-          render json: @equipamento.errors, status: :unprocessable_entity
+          render_validation_errors(@equipamento)
         end
       end
 
@@ -55,25 +55,7 @@ module Api
                               .where.not(laudo: [ nil, "" ])
                               .order("ordem_servicos.created_at DESC")
 
-        resultado = laudos.map do |oe|
-          {
-            id: oe.id,
-            laudo: oe.laudo,
-            created_at: oe.created_at,
-            updated_at: oe.updated_at,
-            ordem_servico: {
-              id: oe.ordem_servico.id,
-              numero_ordem: oe.ordem_servico.numero_ordem,
-              descricao: oe.ordem_servico.descricao,
-              data_agendamento: oe.ordem_servico.data_agendamento,
-              data_fechamento: oe.ordem_servico.data_fim_atendimento,
-              status: oe.ordem_servico.status&.nome,
-              prioridade: oe.ordem_servico.prioridade&.descricao
-            }
-          }
-        end
-
-        render json: resultado
+        render json: laudos, each_serializer: HistoricoLaudoSerializer
       end
 
       private

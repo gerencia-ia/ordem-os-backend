@@ -25,9 +25,7 @@ module Api
         if user.save
           render json: user, status: :created
         else
-          render json: {
-            errors: user.errors.full_messages
-          }, status: :unprocessable_entity
+          render_validation_errors(user)
         end
       end
 
@@ -37,9 +35,7 @@ module Api
         if @user.update(user_params)
           render json: @user
         else
-          render json: {
-            errors: @user.errors.full_messages
-          }, status: :unprocessable_entity
+          render_validation_errors(@user)
         end
       end
 

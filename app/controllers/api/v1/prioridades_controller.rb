@@ -22,7 +22,7 @@ module Api
         if @prioridade.save
           render json: @prioridade, status: :created
         else
-          render json: @prioridade.errors, status: :unprocessable_entity
+          render_validation_errors(@prioridade)
         end
       end
 
@@ -31,7 +31,7 @@ module Api
         if @prioridade.update(prioridade_params)
           render json: @prioridade
         else
-          render json: @prioridade.errors, status: :unprocessable_entity
+          render_validation_errors(@prioridade)
         end
       end
 

@@ -28,7 +28,7 @@ module Api
         if @role.save
           render json: @role, status: :created
         else
-          render json: @role.errors, status: :unprocessable_entity
+          render_validation_errors(@role)
         end
       end
 
@@ -39,7 +39,7 @@ module Api
         if @role.update(role_params)
           render json: @role
         else
-          render json: @role.errors, status: :unprocessable_entity
+          render_validation_errors(@role)
         end
       end
 

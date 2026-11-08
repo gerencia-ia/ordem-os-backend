@@ -5,4 +5,3 @@ class UserSerializer < ActiveModel::Serializer
 
   belongs_to :role
 end
-

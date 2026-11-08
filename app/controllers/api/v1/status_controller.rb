@@ -22,7 +22,7 @@ module Api
         if @status.save
           render json: @status, status: :created
         else
-          render json: @status.errors, status: :unprocessable_entity
+          render_validation_errors(@status)
         end
       end
 
@@ -31,7 +31,7 @@ module Api
         if @status.update(status_params)
           render json: @status
         else
-          render json: @status.errors, status: :unprocessable_entity
+          render_validation_errors(@status)
         end
       end
 

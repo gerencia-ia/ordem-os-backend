@@ -12,7 +12,12 @@ module Api
         authorize! OrdemServico
 
         @ordem_servicos = authorized_scope(
-          OrdemServico.includes(:cliente, :endereco, :users, :status, :prioridade)
+          OrdemServico.includes(
+            :status, :prioridade, :endereco, :users,
+            cliente: [ :telefones, :enderecos ],
+            os_equipamentos: :equipamento,
+            os_servicos: { servico: :categorias_servico }
+          )
         )
 
         if params[:cliente_id].present?
@@ -44,7 +49,7 @@ module Api
         if @ordem_servico.save
           render json: @ordem_servico, status: :created
         else
-          render json: @ordem_servico.errors, status: :unprocessable_entity
+          render_validation_errors(@ordem_servico)
         end
       end
 
@@ -54,7 +59,7 @@ module Api
         if @ordem_servico.update(ordem_servico_params)
           render json: @ordem_servico
         else
-          render json: @ordem_servico.errors, status: :unprocessable_entity
+          render_validation_errors(@ordem_servico)
         end
       end
 
@@ -71,7 +76,7 @@ module Api
         if @ordem_servico.update(status_id: params[:status_id])
           render json: @ordem_servico
         else
-          render json: @ordem_servico.errors, status: :unprocessable_entity
+          render_validation_errors(@ordem_servico)
         end
       end
 
@@ -94,7 +99,7 @@ module Api
             ordem_servico_id: @ordem_servico.id
           }, status: :ok
         else
-          render json: os_equipamento.errors, status: :unprocessable_entity
+          render_validation_errors(os_equipamento)
         end
       end
 
@@ -116,7 +121,7 @@ module Api
             quantidade: os_servico.quantidade
           }, status: :created
         else
-          render json: os_servico.errors, status: :unprocessable_entity
+          render_validation_errors(os_servico)
         end
       end
 
@@ -147,7 +152,7 @@ module Api
         if os_tecnico.save
           render json: { id: os_tecnico.id, ordem_servico_id: @ordem_servico.id, user_id: user.id }, status: :created
         else
-          render json: os_tecnico.errors, status: :unprocessable_entity
+          render_validation_errors(os_tecnico)
         end
       end
 
@@ -165,7 +170,12 @@ module Api
       private
 
       def set_ordem_servico
-        @ordem_servico = OrdemServico.find(params[:id])
+        @ordem_servico = OrdemServico.includes(
+          :status, :prioridade, :endereco, :users,
+          cliente: [ :telefones, :enderecos ],
+          os_equipamentos: :equipamento,
+          os_servicos: { servico: :categorias_servico }
+        ).find(params[:id])
       rescue ActiveRecord::RecordNotFound
         render json: { error: "Not found" }, status: :not_found
       end

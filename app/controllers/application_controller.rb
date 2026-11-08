@@ -10,6 +10,13 @@ class ApplicationController < ActionController::API
 
   private
 
+  def render_validation_errors(record)
+    render json: {
+      errors: record.errors.full_messages,
+      details: record.errors.messages
+    }, status: :unprocessable_entity
+  end
+
   def user_not_authorized(exception)
     render json: {
       error: "Acesso negado",
