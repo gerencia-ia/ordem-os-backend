@@ -25,7 +25,7 @@ class OrdemServicoSerializer < ActiveModel::Serializer
 
     {
       id: p.id,
-      nome: p.descricao
+      descricao: p.descricao
     }
   end
 
