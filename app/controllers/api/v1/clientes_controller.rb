@@ -6,16 +6,19 @@ module Api
       before_action :set_cliente, only: [ :show, :update, :destroy ]
 
       def index
+        authorize! Cliente
         clientes = Cliente.includes(:telefones, :enderecos).all
         render json: clientes.as_json(include: [ :telefones, :enderecos ])
       end
 
       def show
+        authorize! @cliente
         cliente = Cliente.includes(:telefones, :enderecos).find(params[:id])
         render json: cliente.as_json(include: [ :telefones, :enderecos ])
       end
 
       def create
+        authorize! Cliente
         assign_nested_params
 
         cliente = Cliente.new(cliente_params)
@@ -27,6 +30,7 @@ module Api
       end
 
       def update
+        authorize! @cliente
         assign_nested_params
 
         if @cliente.update(cliente_params)
@@ -37,6 +41,7 @@ module Api
       end
 
       def destroy
+        authorize! @cliente
         @cliente.destroy
         head :no_content
       end

@@ -1,21 +1,25 @@
+# frozen_string_literal: true
+
 module Api
   module V1
     class UsersController < BaseController
       before_action :set_user, only: [ :show, :update, :destroy ]
 
       def index
+        authorize! User
         users = User.includes(:role).all
 
         render json: users
       end
 
       def show
-        user = User.find(params[:id])
+        authorize! @user
 
-        render json: user
+        render json: @user
       end
 
       def create
+        authorize! User
         user = User.new(user_params)
 
         if user.save
@@ -28,21 +32,20 @@ module Api
       end
 
       def update
-        user = User.find(params[:id])
+        authorize! @user
 
-        if user.update(user_params)
-          render json: user
+        if @user.update(user_params)
+          render json: @user
         else
           render json: {
-            errors: user.errors.full_messages
+            errors: @user.errors.full_messages
           }, status: :unprocessable_entity
         end
       end
 
       def destroy
-        user = User.find(params[:id])
-
-        user.destroy
+        authorize! @user
+        @user.destroy
 
         head :no_content
       end
@@ -56,25 +59,13 @@ module Api
       end
 
       def user_params
-        raw_password = params[:user]&.dig(:password) || params[:user]&.dig(:senha) || params[:password] || params[:senha]
         data = params[:user].present? ? params.require(:user) : params
 
-        p = data.permit(
-          :nome,
-          :cpf,
-          :email,
-          :telefone,
-          :role_id,
-          :password,
-          :senha
-        )
+        permitted_attributes = [ :nome, :cpf, :email, :telefone, :password ]
+        permitted_attributes << :role_id if current_user&.admin?
 
-        p[:password] = raw_password if raw_password.present?
-        p.delete(:senha)
+        p = data.permit(permitted_attributes)
         p.delete(:password) if p[:password].blank?
-
-        p[:cpf] = p[:cpf].gsub(/\D/, "") if p[:cpf].present?
-        p[:telefone] = p[:telefone].gsub(/\D/, "") if p[:telefone].present?
 
         p
       end
