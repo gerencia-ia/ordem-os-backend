@@ -67,6 +67,9 @@ RSpec.configure do |config|
 
   # Filter lines from Rails gems in backtraces.
   config.filter_rails_from_backtrace!
-  # arbitrary gems may also be filtered via:
-  # config.filter_gems_from_backtrace("gem name")
+
+  # Exclude swagger documentation integration specs from normal rspec runs
+  # They are executed by `rake rswag:specs:swaggerize`
+  is_swaggerizing = ARGV.any? { |arg| arg.include?("SwaggerFormatter") } || ENV["SWAGGERIZE"].present?
+  config.filter_run_excluding :swagger_doc unless is_swaggerizing
 end
