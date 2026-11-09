@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_08_10_224809) do
+ActiveRecord::Schema[8.0].define(version: 2026_11_08_130000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -126,6 +126,17 @@ ActiveRecord::Schema[8.0].define(version: 2026_08_10_224809) do
     t.index ["categorias_servico_id"], name: "index_servicos_on_categorias_servico_id"
   end
 
+  create_table "sessions", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.string "token", null: false
+    t.string "ip_address"
+    t.string "user_agent"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["token"], name: "index_sessions_on_token", unique: true
+    t.index ["user_id"], name: "index_sessions_on_user_id"
+  end
+
   create_table "status", force: :cascade do |t|
     t.string "nome"
     t.datetime "created_at", null: false
@@ -179,6 +190,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_08_10_224809) do
   add_foreign_key "os_tecnicos", "ordem_servicos"
   add_foreign_key "os_tecnicos", "users"
   add_foreign_key "servicos", "categorias_servicos"
+  add_foreign_key "sessions", "users"
   add_foreign_key "tarefas", "ordem_servicos"
   add_foreign_key "tarefas", "status"
   add_foreign_key "tarefas", "users"
