@@ -7,10 +7,8 @@ puts "Criando catálogo..."
 # ============================================================
 
 [
-  "Aberta",
   "Não iniciada",
   "Em andamento",
-  "Aguardando",
   "Concluída",
   "Cancelada"
 ].each do |nome|

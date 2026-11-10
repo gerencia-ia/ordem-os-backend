@@ -1,54 +1,57 @@
 # frozen_string_literal: true
 
-require 'rails_helper'
-
-puts "SWAGGER HELPER CARREGADO"
+require "rails_helper"
 
 RSpec.configure do |config|
   # Specify a root folder where Swagger JSON files are generated
-  # NOTE: If you're using the rswag-api to serve API descriptions, you'll need
-  # to ensure that it's configured to serve Swagger from the same folder
-  config.openapi_root = Rails.root.join('swagger').to_s
+  config.openapi_root = Rails.root.join("swagger").to_s
 
   # Define one or more Swagger documents and provide global metadata for each one
-  # When you run the 'rswag:specs:swaggerize' rake task, the complete Swagger will
-  # be generated at the provided relative path under openapi_root
-  # By default, the operations defined in spec files are added to the first
-  # document below. You can override this behavior by adding a openapi_spec tag to the
-  # the root example_group in your specs, e.g. describe '...', openapi_spec: 'v2/swagger.json'
   config.openapi_specs = {
-    'v1/swagger.yaml' => {
-      openapi: '3.0.1',
+    "v1/swagger.yaml" => {
+      openapi: "3.0.1",
       info: {
         title: "Ordem OS API",
         version: "v1",
         description: <<~DESC
-          API REST para gerenciamento de Ordens de Serviço.
+          API REST para gerenciamento de Ordens de Serviço, Clientes, Equipamentos e Catálogo.
 
-          ## Recursos
+          ## Autenticação
+          Esta API utiliza autenticação por **Bearer Token** via Sessões nativas do Rails 8.
+          1. Efetue login em `POST /api/v1/login` informando seu CPF e senha.
+          2. Copie o `token` retornado.
+          3. Clique no botão verde **Authorize 🔓** no topo desta página e informe o token (ex: `Bearer seu_token` ou apenas `seu_token`).
+          4. Todas as rotas protegidas passarão a enviar o header automaticamente.
 
-          - Autenticação JWT
-          - Clientes
-          - Equipamentos
-          - Técnicos
-          - Ordens de Serviço
-          - Serviços
-
-          Desenvolvida em Ruby on Rails 8.
+          Desenvolvida em **Ruby on Rails 8.0** e **Ruby 3.4**.
         DESC
       },
-      paths: {},
       servers: [
         {
-          url: 'https://ordem-os-backend.onrender.com/'
+          url: "/",
+          description: "Servidor Atual (Local / Ambiente Ativo)"
+        },
+        {
+          url: "https://ordem-os-backend.onrender.com",
+          description: "Ambiente de Produção (Render)"
         }
-      ]
+      ],
+      components: {
+        securitySchemes: {
+          bearer_auth: {
+            type: :http,
+            scheme: :bearer,
+            bearerFormat: :token,
+            description: "Token de autenticação retornado no login (/api/v1/login). Exemplo: Bearer <token> ou apenas <token>"
+          }
+        }
+      },
+      security: [
+        { bearer_auth: [] }
+      ],
+      paths: {}
     }
   }
 
-  # Specify the format of the output Swagger file when running 'rswag:specs:swaggerize'.
-  # The openapi_specs configuration option has the filename including format in
-  # the key, this may want to be changed to avoid putting yaml in json files.
-  # Defaults to json. Accepts ':json' and ':yaml'.
   config.openapi_format = :yaml
 end

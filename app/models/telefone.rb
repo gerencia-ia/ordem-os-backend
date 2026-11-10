@@ -1,7 +1,9 @@
 # frozen_string_literal: true
 
 class Telefone < ApplicationRecord
-  belongs_to :cliente, foreign_key: :cliente_id, inverse_of: :telefones
+  normalizes :numero, with: ->(n) { n.to_s.gsub(/\D/, "") }
 
-  validates :numero, presence: true
+  belongs_to :cliente, inverse_of: :telefones
+
+  validates :numero, presence: true, length: { in: 10..11, message: "deve conter DDD + 8 ou 9 dígitos" }
 end

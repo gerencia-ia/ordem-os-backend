@@ -35,10 +35,6 @@ user_2 = User.find_by!(
   cpf: "44444444444"
 )
 
-status_aberta = Status.find_by!(
-  nome: "Aberta"
-)
-
 status_nao_iniciada = Status.find_by!(
   nome: "Não iniciada"
 )
@@ -72,7 +68,7 @@ ordem_1 = OrdemServico.find_or_create_by!(
 ) do |os|
   os.cliente = cliente_1
   os.endereco = endereco_1
-  os.status = status_aberta
+  os.status = status_nao_iniciada
   os.prioridade = prioridade_media
 
   os.data_agendamento = 2.days.from_now

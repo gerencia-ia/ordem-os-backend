@@ -6,32 +6,37 @@ module Api
       before_action :set_status, only: [ :show, :update, :destroy ]
 
       def index
+        authorize! Status
         @status = Status.all
         render json: @status
       end
 
       def show
+        authorize! @status
         render json: @status
       end
 
       def create
+        authorize! Status
         @status = Status.new(status_params)
         if @status.save
           render json: @status, status: :created
         else
-          render json: @status.errors, status: :unprocessable_entity
+          render_validation_errors(@status)
         end
       end
 
       def update
+        authorize! @status
         if @status.update(status_params)
           render json: @status
         else
-          render json: @status.errors, status: :unprocessable_entity
+          render_validation_errors(@status)
         end
       end
 
       def destroy
+        authorize! @status
         @status.destroy
         head :no_content
       end

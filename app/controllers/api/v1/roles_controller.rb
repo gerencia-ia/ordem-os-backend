@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Api
   module V1
     class RolesController < BaseController
@@ -5,6 +7,7 @@ module Api
 
       # GET /roles
       def index
+        authorize! Role
         @roles = Role.all
 
         render json: @roles
@@ -12,44 +15,53 @@ module Api
 
       # GET /roles/1
       def show
+        authorize! @role
+
         render json: @role
       end
 
       # POST /roles
       def create
+        authorize! Role
         @role = Role.new(role_params)
 
         if @role.save
-          render json: @role, status: :created, location: @role
+          render json: @role, status: :created
         else
-          render json: @role.errors, status: :unprocessable_content
+          render_validation_errors(@role)
         end
       end
 
       # PATCH/PUT /roles/1
       def update
+        authorize! @role
+
         if @role.update(role_params)
           render json: @role
         else
-          render json: @role.errors, status: :unprocessable_content
+          render_validation_errors(@role)
         end
       end
 
       # DELETE /roles/1
       def destroy
+        authorize! @role
         @role.destroy!
+
+        head :no_content
       end
 
       private
-        # Use callbacks to share common setup or constraints between actions.
-        def set_role
-          @role = Role.find(params.expect(:id))
-        end
 
-        # Only allow a list of trusted parameters through.
-        def role_params
-          params.expect(role: [ :nome ])
-        end
+      def set_role
+        @role = Role.find(params[:id])
+      rescue ActiveRecord::RecordNotFound
+        render json: { error: "Not found" }, status: :not_found
+      end
+
+      def role_params
+        params.require(:role).permit(:nome)
+      end
     end
   end
 end

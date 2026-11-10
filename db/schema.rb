@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_08_10_224809) do
+ActiveRecord::Schema[8.0].define(version: 2026_11_08_130000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -64,7 +64,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_08_10_224809) do
     t.datetime "updated_at", null: false
     t.string "numero_ordem"
     t.string "descricao"
-    t.string "tipo_servico"
     t.date "data_vencimento"
     t.decimal "custo_estimado", precision: 10, scale: 2
     t.bigint "cliente_id"
@@ -127,6 +126,17 @@ ActiveRecord::Schema[8.0].define(version: 2026_08_10_224809) do
     t.index ["categorias_servico_id"], name: "index_servicos_on_categorias_servico_id"
   end
 
+  create_table "sessions", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.string "token", null: false
+    t.string "ip_address"
+    t.string "user_agent"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["token"], name: "index_sessions_on_token", unique: true
+    t.index ["user_id"], name: "index_sessions_on_user_id"
+  end
+
   create_table "status", force: :cascade do |t|
     t.string "nome"
     t.datetime "created_at", null: false
@@ -136,13 +146,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_08_10_224809) do
   create_table "tarefas", force: :cascade do |t|
     t.bigint "ordem_servico_id", null: false
     t.string "descricao"
-    t.string "status", default: "nao_iniciada"
+    t.bigint "status_id", null: false
     t.bigint "user_id"
     t.datetime "data_inicio"
     t.datetime "data_fim"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["ordem_servico_id"], name: "index_tarefas_on_ordem_servico_id"
+    t.index ["status_id"], name: "index_tarefas_on_status_id"
   end
 
   create_table "telefones", force: :cascade do |t|
@@ -179,7 +190,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_08_10_224809) do
   add_foreign_key "os_tecnicos", "ordem_servicos"
   add_foreign_key "os_tecnicos", "users"
   add_foreign_key "servicos", "categorias_servicos"
+  add_foreign_key "sessions", "users"
   add_foreign_key "tarefas", "ordem_servicos"
+  add_foreign_key "tarefas", "status"
   add_foreign_key "tarefas", "users"
   add_foreign_key "telefones", "clientes"
   add_foreign_key "users", "roles"

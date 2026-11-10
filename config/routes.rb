@@ -27,7 +27,9 @@ Rails.application.routes.draw do
         end
       end
       resources :prioridades
+      resources :roles
       post "login", to: "sessions#create"
+      delete "logout", to: "sessions#destroy"
 
       # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 

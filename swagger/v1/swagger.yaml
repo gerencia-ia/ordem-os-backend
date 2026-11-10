@@ -3,19 +3,2012 @@ openapi: 3.0.1
 info:
   title: Ordem OS API
   version: v1
-  description: |
-    API REST para gerenciamento de Ordens de Serviço.
-
-    ## Recursos
-
-    - Autenticação JWT
-    - Clientes
-    - Equipamentos
-    - Técnicos
-    - Ordens de Serviço
-    - Serviços
-
-    Desenvolvida em Ruby on Rails 8.
-paths: {}
+  description: "API REST para gerenciamento de Ordens de Serviço, Clientes, Equipamentos
+    e Catálogo.\n\n## Autenticação\nEsta API utiliza autenticação por **Bearer Token**
+    via Sessões nativas do Rails 8.\n1. Efetue login em `POST /api/v1/login` informando
+    seu CPF e senha.\n2. Copie o `token` retornado.\n3. Clique no botão verde **Authorize
+    \U0001F513** no topo desta página e informe o token (ex: `Bearer seu_token` ou
+    apenas `seu_token`).\n4. Todas as rotas protegidas passarão a enviar o header
+    automaticamente.\n\nDesenvolvida em **Ruby on Rails 8.0** e **Ruby 3.4**.\n"
 servers:
-- url: https://ordem-os-backend.onrender.com/
+- url: "/"
+  description: Servidor Atual (Local / Ambiente Ativo)
+- url: https://ordem-os-backend.onrender.com
+  description: Ambiente de Produção (Render)
+components:
+  securitySchemes:
+    bearer_auth:
+      type: http
+      scheme: bearer
+      bearerFormat: token
+      description: 'Token de autenticação retornado no login (/api/v1/login). Exemplo:
+        Bearer <token> ou apenas <token>'
+security:
+- bearer_auth: []
+paths:
+  "/api/v1/categorias_servico":
+    get:
+      summary: Lista categorias de serviço
+      tags:
+      - Categorias de Serviço
+      description: 'Retorna as categorias que agrupam os serviços prestados (ex: Higienização,
+        Instalação, Reparo Elétrico).'
+      operationId: getCategoriasServico
+      responses:
+        '200':
+          description: Lista de categorias retornada
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      example: 1
+                    descricao:
+                      type: string
+                      example: Manutenção Preventiva
+    post:
+      summary: Cadastra uma nova categoria
+      tags:
+      - Categorias de Serviço
+      operationId: createCategoriaServico
+      parameters: []
+      responses:
+        '201':
+          description: Categoria criada com sucesso
+          content:
+            application/json:
+              schema:
+                type: object
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                categorias_servico:
+                  type: object
+                  properties:
+                    descricao:
+                      type: string
+                      example: Instalação e Infraestrutura
+                  required:
+                  - descricao
+              required:
+              - categorias_servico
+  "/api/v1/categorias_servico/{id}":
+    parameters:
+    - name: id
+      in: path
+      description: ID único da Categoria
+      example: 1
+      required: true
+      schema:
+        type: integer
+    get:
+      summary: Visualiza detalhes de uma categoria
+      tags:
+      - Categorias de Serviço
+      operationId: getCategoriaServico
+      responses:
+        '200':
+          description: Categoria localizada
+          content:
+            application/json:
+              schema:
+                type: object
+    patch:
+      summary: Atualiza a descrição de uma categoria
+      tags:
+      - Categorias de Serviço
+      operationId: updateCategoriaServico
+      parameters: []
+      responses:
+        '200':
+          description: Categoria atualizada
+          content:
+            application/json:
+              schema:
+                type: object
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                categorias_servico:
+                  type: object
+                  properties:
+                    descricao:
+                      type: string
+                      example: Instalação, Tubulação e Infraestrutura
+    delete:
+      summary: Remove uma categoria de serviço
+      tags:
+      - Categorias de Serviço
+      operationId: deleteCategoriaServico
+      responses:
+        '204':
+          description: Categoria removida
+  "/api/v1/clientes":
+    get:
+      summary: Lista todos os clientes
+      tags:
+      - Clientes
+      description: Retorna a lista completa de clientes cadastrados, incluindo seus
+        respectivos endereços e telefones.
+      operationId: getClientes
+      responses:
+        '200':
+          description: Lista de clientes retornada com sucesso
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      example: 1
+                    nome:
+                      type: string
+                      example: João da Silva
+                    email:
+                      type: string
+                      example: joao.silva@email.com
+                    data_registro:
+                      type: string
+                      format: date
+                      example: '2026-01-10'
+                    data_ultima_visita:
+                      type: string
+                      format: date
+                      example: '2026-03-15'
+                    enderecos:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 1
+                          rua:
+                            type: string
+                            example: Av. Paulista
+                          numero:
+                            type: string
+                            example: '1000'
+                          bairro:
+                            type: string
+                            example: Bela Vista
+                          complemento:
+                            type: string
+                            example: Apto 42
+                          cep:
+                            type: string
+                            example: '01310100'
+                          cidade:
+                            type: string
+                            example: São Paulo
+                    telefones:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 1
+                          numero:
+                            type: string
+                            example: '11988887777'
+        '401':
+          description: Não autorizado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Não autorizado
+    post:
+      summary: Cadastra um novo cliente
+      tags:
+      - Clientes
+      description: Cria um novo cliente com suporte a cadastro aninhado de endereços,
+        telefones e equipamentos em uma única requisição.
+      operationId: createCliente
+      parameters: []
+      responses:
+        '201':
+          description: Cliente cadastrado com sucesso
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    example: 10
+                  nome:
+                    type: string
+                    example: Supermercado Progresso Ltda
+                  email:
+                    type: string
+                    example: contato@superprogresso.com.br
+                  enderecos:
+                    type: array
+                    items:
+                      type: object
+                  telefones:
+                    type: array
+                    items:
+                      type: object
+        '422':
+          description: Erro de validação cadastral
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: object
+                    example:
+                      enderecos:
+                      - deve conter ao menos um endereço
+                      telefones:
+                      - deve conter ao menos um telefone
+        '403':
+          description: Acesso negado (permissão insuficiente)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Acesso negado
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                cliente:
+                  type: object
+                  properties:
+                    nome:
+                      type: string
+                      example: Supermercado Progresso Ltda
+                    email:
+                      type: string
+                      example: contato@superprogresso.com.br
+                    data_registro:
+                      type: string
+                      format: date
+                      example: '2026-11-08'
+                    data_ultima_visita:
+                      type: string
+                      format: date
+                      example: '2026-11-08'
+                    enderecos_attributes:
+                      type: array
+                      description: Lista de endereços (obrigatório ao menos 1)
+                      items:
+                        type: object
+                        properties:
+                          rua:
+                            type: string
+                            example: Rua do Comércio
+                          numero:
+                            type: string
+                            example: '500'
+                          bairro:
+                            type: string
+                            example: Centro Comercial
+                          complemento:
+                            type: string
+                            example: Galpão 2
+                          cep:
+                            type: string
+                            example: '45600000'
+                          cidade:
+                            type: string
+                            example: Itabuna
+                        required:
+                        - rua
+                        - numero
+                        - bairro
+                        - cidade
+                    telefones_attributes:
+                      type: array
+                      description: Lista de telefones (obrigatório ao menos 1)
+                      items:
+                        type: object
+                        properties:
+                          numero:
+                            type: string
+                            example: '73988889999'
+                        required:
+                        - numero
+                    equipamentos_attributes:
+                      type: array
+                      description: Equipamentos do cliente cadastrados previamente
+                      items:
+                        type: object
+                        properties:
+                          marca:
+                            type: string
+                            example: Carrier
+                          btus:
+                            type: integer
+                            example: 36000
+                          local_instalacao:
+                            type: string
+                            example: Área de Vendas - Caixa 1
+                          observacao:
+                            type: string
+                            example: Revisão preventiva semestral
+                  required:
+                  - nome
+                  - enderecos_attributes
+                  - telefones_attributes
+              required:
+              - cliente
+  "/api/v1/clientes/{id}":
+    parameters:
+    - name: id
+      in: path
+      description: ID único do cliente
+      example: 1
+      required: true
+      schema:
+        type: integer
+    get:
+      summary: Visualiza detalhes de um cliente
+      tags:
+      - Clientes
+      description: Retorna as informações completas de um cliente específico com seus
+        endereços e telefones.
+      operationId: getCliente
+      responses:
+        '200':
+          description: Cliente localizado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    example: 1
+                  nome:
+                    type: string
+                    example: João da Silva
+                  email:
+                    type: string
+                    example: joao.silva@email.com
+                  enderecos:
+                    type: array
+                    items:
+                      type: object
+                  telefones:
+                    type: array
+                    items:
+                      type: object
+        '404':
+          description: Cliente não encontrado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Not found
+    patch:
+      summary: Atualiza dados de um cliente
+      tags:
+      - Clientes
+      description: Atualiza os dados cadastrais, telefones ou endereços de um cliente
+        existente.
+      operationId: updateCliente
+      parameters: []
+      responses:
+        '200':
+          description: Cliente atualizado com sucesso
+          content:
+            application/json:
+              schema:
+                type: object
+        '422':
+          description: Erro de validação
+          content:
+            application/json:
+              schema:
+                type: object
+        '403':
+          description: Acesso negado
+          content:
+            application/json:
+              schema:
+                type: object
+        '404':
+          description: Cliente não encontrado
+          content:
+            application/json:
+              schema:
+                type: object
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                cliente:
+                  type: object
+                  properties:
+                    nome:
+                      type: string
+                      example: Supermercado Progresso Matriz
+                    email:
+                      type: string
+                      example: financeiro@superprogresso.com.br
+                    data_ultima_visita:
+                      type: string
+                      format: date
+                      example: '2026-11-08'
+    delete:
+      summary: Remove um cliente
+      tags:
+      - Clientes
+      description: Exclui um cliente da base (apenas Administrador ou Secretaria).
+        Retorna 422 se possuir ordens associadas com restrição.
+      operationId: deleteCliente
+      responses:
+        '204':
+          description: Cliente removido com sucesso
+        '403':
+          description: Acesso negado
+          content:
+            application/json:
+              schema:
+                type: object
+        '404':
+          description: Cliente não encontrado
+          content:
+            application/json:
+              schema:
+                type: object
+  "/api/v1/equipamentos":
+    get:
+      summary: Lista equipamentos
+      tags:
+      - Equipamentos
+      description: Retorna todos os equipamentos cadastrados, com opção de filtrar
+        por cliente.
+      operationId: getEquipamentos
+      parameters:
+      - name: cliente_id
+        in: query
+        required: false
+        description: Filtrar equipamentos por ID do cliente
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Lista de equipamentos retornada
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      example: 1
+                    marca:
+                      type: string
+                      example: Daikin
+                    btus:
+                      type: integer
+                      example: 18000
+                    local_instalacao:
+                      type: string
+                      example: Escritório Diretoria
+                    observacao:
+                      type: string
+                      example: Instalado em 2024
+                    cliente_id:
+                      type: integer
+                      example: 1
+    post:
+      summary: Cadastra um novo equipamento
+      tags:
+      - Equipamentos
+      description: Cadastra um novo equipamento associado a um cliente existente.
+      operationId: createEquipamento
+      parameters: []
+      responses:
+        '201':
+          description: Equipamento cadastrado com sucesso
+          content:
+            application/json:
+              schema:
+                type: object
+        '422':
+          description: Erro de validação
+          content:
+            application/json:
+              schema:
+                type: object
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                equipamento:
+                  type: object
+                  properties:
+                    marca:
+                      type: string
+                      example: Springer Midea Inverter
+                    btus:
+                      type: integer
+                      example: 12000
+                    local_instalacao:
+                      type: string
+                      example: Sala de Reuniões 02
+                    observacao:
+                      type: string
+                      example: Voltagem 220V monofásica
+                    cliente_id:
+                      type: integer
+                      example: 1
+                  required:
+                  - marca
+                  - btus
+                  - cliente_id
+              required:
+              - equipamento
+  "/api/v1/equipamentos/{id}":
+    parameters:
+    - name: id
+      in: path
+      description: ID único do Equipamento
+      example: 1
+      required: true
+      schema:
+        type: integer
+    get:
+      summary: Visualiza detalhes de um equipamento
+      tags:
+      - Equipamentos
+      operationId: getEquipamento
+      responses:
+        '200':
+          description: Equipamento encontrado
+          content:
+            application/json:
+              schema:
+                type: object
+        '404':
+          description: Equipamento não encontrado
+          content:
+            application/json:
+              schema:
+                type: object
+    patch:
+      summary: Atualiza dados de um equipamento
+      tags:
+      - Equipamentos
+      operationId: updateEquipamento
+      parameters: []
+      responses:
+        '200':
+          description: Equipamento atualizado
+          content:
+            application/json:
+              schema:
+                type: object
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                equipamento:
+                  type: object
+                  properties:
+                    marca:
+                      type: string
+                      example: Daikin Inverter Advance
+                    btus:
+                      type: integer
+                      example: 18000
+                    local_instalacao:
+                      type: string
+                      example: Sala TI / Servidores
+    delete:
+      summary: Remove um equipamento
+      tags:
+      - Equipamentos
+      operationId: deleteEquipamento
+      responses:
+        '204':
+          description: Equipamento removido com sucesso
+  "/api/v1/equipamentos/{id}/historico_laudos":
+    parameters:
+    - name: id
+      in: path
+      description: ID do Equipamento
+      example: 1
+      required: true
+      schema:
+        type: integer
+    get:
+      summary: Histórico de laudos do equipamento em todas as ordens de serviço
+      tags:
+      - Equipamentos
+      description: Retorna a linha do tempo completa de todos os laudos e pareceres
+        técnicos já emitidos para este equipamento em todas as ordens de serviço atendidas.
+      operationId: getHistoricoLaudosEquipamento
+      responses:
+        '200':
+          description: Histórico retornado com sucesso em ordem decrescente de atendimento
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      example: 12
+                    laudo:
+                      type: string
+                      example: Higienização completa da serpentina e troca do capacitor
+                        do motor do ventilador.
+                    created_at:
+                      type: string
+                      format: date_time
+                    updated_at:
+                      type: string
+                      format: date_time
+                    ordem_servico:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 3
+                        numero_ordem:
+                          type: string
+                          example: OS-2026-0044
+                        descricao:
+                          type: string
+                          example: Manutenção periódica
+                        data_agendamento:
+                          type: string
+                          format: date_time
+                        data_fechamento:
+                          type: string
+                          format: date_time
+                        status:
+                          type: string
+                          example: Finalizada
+                        prioridade:
+                          type: string
+                          example: Normal
+  "/api/v1/ordem_servicos":
+    get:
+      summary: Lista ordens de serviço
+      tags:
+      - Ordens de Serviço
+      description: Retorna a listagem de Ordens de Serviço. Administradores e Secretárias
+        visualizam todas; Técnicos visualizam apenas as suas OSs atribuídas (Action
+        Policy Scope).
+      operationId: getOrdemServicos
+      parameters:
+      - name: cliente_id
+        in: query
+        required: false
+        description: Filtrar ordens por cliente
+        schema:
+          type: integer
+      - name: mes
+        in: query
+        required: false
+        description: Filtrar por mês do agendamento (1 a 12)
+        schema:
+          type: integer
+      - name: ano
+        in: query
+        required: false
+        description: 'Filtrar por ano do agendamento (ex: 2026)'
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Lista de ordens de serviço retornada
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+        '401':
+          description: Não autorizado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Não autorizado
+    post:
+      summary: Abre uma nova ordem de serviço
+      tags:
+      - Ordens de Serviço
+      description: Cria uma nova Ordem de Serviço com técnicos alocados, serviços
+        orçados e equipamentos vinculados.
+      operationId: createOrdemServico
+      parameters: []
+      responses:
+        '201':
+          description: Ordem de serviço criada com sucesso
+          content:
+            application/json:
+              schema:
+                type: object
+        '422':
+          description: Erro de validação nos campos da OS
+          content:
+            application/json:
+              schema:
+                type: object
+        '403':
+          description: Acesso negado (apenas Administradores e Secretárias podem criar
+            OS)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Acesso negado
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ordem_servico:
+                  type: object
+                  properties:
+                    numero_ordem:
+                      type: string
+                      example: OS-2026-0150
+                    descricao:
+                      type: string
+                      example: Manutenção preventiva semestral e higienização química
+                        de condicionadores de ar.
+                    tipo_servico:
+                      type: string
+                      example: Preventiva
+                    data_agendamento:
+                      type: string
+                      format: date_time
+                      example: '2026-11-20T09:30:00Z'
+                    data_vencimento:
+                      type: string
+                      format: date
+                      example: '2026-11-25'
+                    custo_estimado:
+                      type: string
+                      example: '950.00'
+                    valor_total:
+                      type: string
+                      example: '950.00'
+                    observacao:
+                      type: string
+                      example: Cliente solicita contato telefônico 30 minutos antes
+                        da chegada da equipe técnica.
+                    cliente_id:
+                      type: integer
+                      example: 1
+                    endereco_id:
+                      type: integer
+                      example: 1
+                    prioridade_id:
+                      type: integer
+                      example: 2
+                    status_id:
+                      type: integer
+                      example: 1
+                    user_ids:
+                      type: array
+                      description: Lista de IDs dos técnicos responsáveis pela OS
+                      items:
+                        type: integer
+                      example:
+                      - 2
+                      - 4
+                    servico_ids:
+                      type: array
+                      description: Lista de IDs dos serviços incluídos
+                      items:
+                        type: integer
+                      example:
+                      - 1
+                      - 3
+                    equipamento_ids:
+                      type: array
+                      description: Lista de IDs dos equipamentos do cliente a serem
+                        atendidos
+                      items:
+                        type: integer
+                      example:
+                      - 1
+                    os_equipamentos_attributes:
+                      type: array
+                      description: Laudo inicial ou específico por equipamento
+                      items:
+                        type: object
+                        properties:
+                          equipamento_id:
+                            type: integer
+                            example: 1
+                          laudo:
+                            type: string
+                            example: Constatado acúmulo de poeira nas aletas e necessidade
+                              de troca do capacitor.
+                  required:
+                  - numero_ordem
+                  - cliente_id
+                  - endereco_id
+                  - prioridade_id
+                  - status_id
+              required:
+              - ordem_servico
+  "/api/v1/ordem_servicos/{id}":
+    parameters:
+    - name: id
+      in: path
+      description: ID único da Ordem de Serviço
+      example: 1
+      required: true
+      schema:
+        type: integer
+    get:
+      summary: Visualiza detalhes de uma ordem de serviço
+      tags:
+      - Ordens de Serviço
+      description: Retorna as informações completas da Ordem de Serviço, incluindo
+        técnicos, equipamentos, laudos e status.
+      operationId: getOrdemServico
+      responses:
+        '200':
+          description: Ordem de serviço encontrada
+          content:
+            application/json:
+              schema:
+                type: object
+        '403':
+          description: Acesso negado (técnicos só podem ver OSs atribuídas a eles)
+          content:
+            application/json:
+              schema:
+                type: object
+        '404':
+          description: Ordem de serviço não encontrada
+          content:
+            application/json:
+              schema:
+                type: object
+    patch:
+      summary: Atualiza dados de uma ordem de serviço
+      tags:
+      - Ordens de Serviço
+      description: Atualiza campos da Ordem de Serviço (datas, valores, técnicos,
+        serviços).
+      operationId: updateOrdemServico
+      parameters: []
+      responses:
+        '200':
+          description: Ordem atualizada com sucesso
+          content:
+            application/json:
+              schema:
+                type: object
+        '403':
+          description: Acesso negado
+          content:
+            application/json:
+              schema:
+                type: object
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ordem_servico:
+                  type: object
+                  properties:
+                    observacao:
+                      type: string
+                      example: Serviço reprogramado a pedido do cliente.
+                    data_agendamento:
+                      type: string
+                      format: date_time
+                      example: '2026-11-22T14:00:00Z'
+                    valor_total:
+                      type: string
+                      example: '1100.00'
+    delete:
+      summary: Exclui uma ordem de serviço
+      tags:
+      - Ordens de Serviço
+      description: Remove a Ordem de Serviço (restrito a Administradores e Secretárias).
+      operationId: deleteOrdemServico
+      responses:
+        '204':
+          description: Ordem excluída com sucesso
+        '403':
+          description: Acesso negado (Técnicos não podem excluir ordens)
+          content:
+            application/json:
+              schema:
+                type: object
+  "/api/v1/ordem_servicos/{id}/update_status":
+    parameters:
+    - name: id
+      in: path
+      description: ID da Ordem de Serviço
+      example: 1
+      required: true
+      schema:
+        type: integer
+    patch:
+      summary: Atualiza o status da ordem de serviço
+      tags:
+      - Ordens de Serviço
+      description: 'Altera rapidamente o status da OS (ex: de ''Aberta'' para ''Em
+        Execução'' ou ''Concluída''). Permitido para técnicos vinculados à OS.'
+      operationId: updateOrdemServicoStatus
+      parameters: []
+      responses:
+        '200':
+          description: Status da OS alterado com sucesso
+          content:
+            application/json:
+              schema:
+                type: object
+        '403':
+          description: Acesso negado
+          content:
+            application/json:
+              schema:
+                type: object
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status_id:
+                  type: integer
+                  description: ID do novo status
+                  example: 2
+              required:
+              - status_id
+  "/api/v1/ordem_servicos/{id}/equipamentos/{equipamento_id}/laudo":
+    parameters:
+    - name: id
+      in: path
+      description: ID da Ordem de Serviço
+      example: 1
+      required: true
+      schema:
+        type: integer
+    - name: equipamento_id
+      in: path
+      description: ID do Equipamento
+      example: 1
+      required: true
+      schema:
+        type: integer
+    patch:
+      summary: Atualiza o laudo técnico do equipamento na OS
+      tags:
+      - Ordens de Serviço
+      description: Registra ou atualiza o parecer/laudo técnico emitido para um equipamento
+        específico dentro da OS.
+      operationId: updateEquipamentoLaudo
+      parameters: []
+      responses:
+        '200':
+          description: Laudo registrado com sucesso
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    example: 5
+                  equipamento_id:
+                    type: integer
+                    example: 1
+                  laudo:
+                    type: string
+                  ordem_servico_id:
+                    type: integer
+                    example: 1
+        '404':
+          description: Equipamento não encontrado nesta ordem de serviço
+          content:
+            application/json:
+              schema:
+                type: object
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                laudo:
+                  type: string
+                  description: Texto descritivo do laudo ou parecer técnico
+                  example: Efetuada substituição do sensor de temperatura e recarga
+                    completa de gás refrigerante. Equipamento em pleno funcionamento.
+              required:
+              - laudo
+  "/api/v1/ordem_servicos/{id}/servicos":
+    parameters:
+    - name: id
+      in: path
+      description: ID da Ordem de Serviço
+      example: 1
+      required: true
+      schema:
+        type: integer
+    post:
+      summary: Adiciona um serviço à ordem de serviço
+      tags:
+      - Ordens de Serviço
+      description: Vincula um serviço do catálogo à Ordem de Serviço com sua respectiva
+        quantidade.
+      operationId: addServicoToOrdem
+      parameters: []
+      responses:
+        '201':
+          description: Serviço adicionado com sucesso
+          content:
+            application/json:
+              schema:
+                type: object
+        '404':
+          description: Serviço não encontrado
+          content:
+            application/json:
+              schema:
+                type: object
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                servico_id:
+                  type: integer
+                  description: ID do serviço no catálogo
+                  example: 2
+                quantidade:
+                  type: integer
+                  description: Quantidade executada
+                  example: 3
+              required:
+              - servico_id
+  "/api/v1/ordem_servicos/{id}/servicos/{servico_id}":
+    parameters:
+    - name: id
+      in: path
+      description: ID da Ordem de Serviço
+      example: 1
+      required: true
+      schema:
+        type: integer
+    - name: servico_id
+      in: path
+      description: ID do Serviço a ser removido
+      example: 2
+      required: true
+      schema:
+        type: integer
+    delete:
+      summary: Remove um serviço da ordem de serviço
+      tags:
+      - Ordens de Serviço
+      description: Desvincula um serviço da Ordem de Serviço.
+      operationId: removeServicoFromOrdem
+      responses:
+        '204':
+          description: Serviço removido com sucesso
+        '404':
+          description: Serviço não associado à ordem de serviço
+          content:
+            application/json:
+              schema:
+                type: object
+  "/api/v1/ordem_servicos/{id}/tecnicos":
+    parameters:
+    - name: id
+      in: path
+      description: ID da Ordem de Serviço
+      example: 1
+      required: true
+      schema:
+        type: integer
+    post:
+      summary: Aloca um técnico na ordem de serviço
+      tags:
+      - Ordens de Serviço
+      description: Atribui um usuário técnico para atendimento desta Ordem de Serviço.
+      operationId: addTecnicoToOrdem
+      parameters: []
+      responses:
+        '201':
+          description: Técnico alocado com sucesso
+          content:
+            application/json:
+              schema:
+                type: object
+        '200':
+          description: Técnico já estava alocado
+          content:
+            application/json:
+              schema:
+                type: object
+        '404':
+          description: Técnico não encontrado
+          content:
+            application/json:
+              schema:
+                type: object
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user_id:
+                  type: integer
+                  description: ID do técnico (usuário com perfil Técnico)
+                  example: 2
+              required:
+              - user_id
+  "/api/v1/ordem_servicos/{id}/tecnicos/{user_id}":
+    parameters:
+    - name: id
+      in: path
+      description: ID da Ordem de Serviço
+      example: 1
+      required: true
+      schema:
+        type: integer
+    - name: user_id
+      in: path
+      description: ID do Técnico a ser removido
+      example: 2
+      required: true
+      schema:
+        type: integer
+    delete:
+      summary: Desvincula um técnico da ordem de serviço
+      tags:
+      - Ordens de Serviço
+      description: Remove a atribuição de um técnico desta Ordem de Serviço.
+      operationId: removeTecnicoFromOrdem
+      responses:
+        '204':
+          description: Técnico desvinculado com sucesso
+        '404':
+          description: Técnico não associado à ordem de serviço
+          content:
+            application/json:
+              schema:
+                type: object
+  "/api/v1/prioridades":
+    get:
+      summary: Lista prioridades de atendimento
+      tags:
+      - Prioridades
+      description: 'Retorna as prioridades configuradas para as ordens de serviço
+        (ex: Baixa, Normal, Alta, Urgente).'
+      operationId: getPrioridades
+      responses:
+        '200':
+          description: Lista de prioridades retornada
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      example: 1
+                    descricao:
+                      type: string
+                      example: Alta
+    post:
+      summary: Cadastra uma nova prioridade
+      tags:
+      - Prioridades
+      operationId: createPrioridade
+      parameters: []
+      responses:
+        '201':
+          description: Prioridade cadastrada
+          content:
+            application/json:
+              schema:
+                type: object
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                prioridade:
+                  type: object
+                  properties:
+                    descricao:
+                      type: string
+                      example: Emergencial
+                  required:
+                  - descricao
+              required:
+              - prioridade
+  "/api/v1/prioridades/{id}":
+    parameters:
+    - name: id
+      in: path
+      description: ID único da Prioridade
+      example: 1
+      required: true
+      schema:
+        type: integer
+    get:
+      summary: Visualiza detalhes de uma prioridade
+      tags:
+      - Prioridades
+      operationId: getPrioridade
+      responses:
+        '200':
+          description: Prioridade encontrada
+          content:
+            application/json:
+              schema:
+                type: object
+    patch:
+      summary: Atualiza uma prioridade
+      tags:
+      - Prioridades
+      operationId: updatePrioridade
+      parameters: []
+      responses:
+        '200':
+          description: Prioridade atualizada
+          content:
+            application/json:
+              schema:
+                type: object
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                prioridade:
+                  type: object
+                  properties:
+                    descricao:
+                      type: string
+                      example: Crítica
+    delete:
+      summary: Remove uma prioridade
+      tags:
+      - Prioridades
+      operationId: deletePrioridade
+      responses:
+        '204':
+          description: Prioridade removida
+  "/api/v1/roles":
+    get:
+      summary: Lista papéis de usuário
+      tags:
+      - Papéis
+      description: 'Retorna a lista de papéis disponíveis no sistema (ex: Administrador,
+        Secretaria, Técnico).'
+      operationId: getRoles
+      responses:
+        '200':
+          description: Lista de papéis retornada
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      example: 1
+                    nome:
+                      type: string
+                      example: Administrador
+    post:
+      summary: Cadastra um novo papel
+      tags:
+      - Papéis
+      description: Cria um novo papel de acesso (restrito a Administradores).
+      operationId: createRole
+      parameters: []
+      responses:
+        '201':
+          description: Papel cadastrado com sucesso
+          content:
+            application/json:
+              schema:
+                type: object
+        '403':
+          description: Acesso negado (apenas Administradores podem gerenciar papéis)
+          content:
+            application/json:
+              schema:
+                type: object
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                role:
+                  type: object
+                  properties:
+                    nome:
+                      type: string
+                      example: Supervisor
+                  required:
+                  - nome
+              required:
+              - role
+  "/api/v1/roles/{id}":
+    parameters:
+    - name: id
+      in: path
+      description: ID único do Papel
+      example: 1
+      required: true
+      schema:
+        type: integer
+    get:
+      summary: Visualiza detalhes de um papel
+      tags:
+      - Papéis
+      operationId: getRole
+      responses:
+        '200':
+          description: Papel encontrado
+          content:
+            application/json:
+              schema:
+                type: object
+        '404':
+          description: Papel não encontrado
+          content:
+            application/json:
+              schema:
+                type: object
+    patch:
+      summary: Atualiza o nome de um papel
+      tags:
+      - Papéis
+      operationId: updateRole
+      parameters: []
+      responses:
+        '200':
+          description: Papel atualizado
+          content:
+            application/json:
+              schema:
+                type: object
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                role:
+                  type: object
+                  properties:
+                    nome:
+                      type: string
+                      example: Coordenador Técnico
+    delete:
+      summary: Remove um papel
+      tags:
+      - Papéis
+      operationId: deleteRole
+      responses:
+        '204':
+          description: Papel excluído
+        '403':
+          description: Acesso negado
+          content:
+            application/json:
+              schema:
+                type: object
+  "/api/v1/servicos":
+    get:
+      summary: Lista catálogo de serviços
+      tags:
+      - Serviços
+      description: Retorna a lista de serviços cadastrados com seus valores, tempos
+        médios de execução e categorias.
+      operationId: getServicos
+      responses:
+        '200':
+          description: Catálogo de serviços retornado
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      example: 1
+                    nome:
+                      type: string
+                      example: Higienização Química de Split até 18.000 BTUs
+                    valor:
+                      type: string
+                      example: '220.00'
+                    tempo_servico:
+                      type: integer
+                      example: 90
+                      description: Tempo estimado em minutos
+                    categorias_servico_id:
+                      type: integer
+                      example: 1
+                    categorias_servico:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 1
+                        descricao:
+                          type: string
+                          example: Manutenção Preventiva
+    post:
+      summary: Cadastra um novo serviço
+      tags:
+      - Serviços
+      description: Adiciona um novo serviço com preço e categoria ao catálogo (Administrador
+        e Secretaria).
+      operationId: createServico
+      parameters: []
+      responses:
+        '201':
+          description: Serviço cadastrado com sucesso
+          content:
+            application/json:
+              schema:
+                type: object
+        '422':
+          description: Erro de validação
+          content:
+            application/json:
+              schema:
+                type: object
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                servico:
+                  type: object
+                  properties:
+                    nome:
+                      type: string
+                      example: Carga de Gás Refrigerante R410A
+                    valor:
+                      type: string
+                      example: '350.00'
+                    tempo_servico:
+                      type: integer
+                      example: 60
+                      description: Tempo estimado em minutos
+                    categorias_servico_id:
+                      type: integer
+                      example: 2
+                  required:
+                  - nome
+                  - valor
+                  - categorias_servico_id
+              required:
+              - servico
+  "/api/v1/servicos/{id}":
+    parameters:
+    - name: id
+      in: path
+      description: ID único do Serviço
+      example: 1
+      required: true
+      schema:
+        type: integer
+    get:
+      summary: Visualiza detalhes de um serviço
+      tags:
+      - Serviços
+      operationId: getServico
+      responses:
+        '200':
+          description: Serviço encontrado
+          content:
+            application/json:
+              schema:
+                type: object
+        '404':
+          description: Serviço não encontrado
+          content:
+            application/json:
+              schema:
+                type: object
+    patch:
+      summary: Atualiza dados de um serviço
+      tags:
+      - Serviços
+      operationId: updateServico
+      parameters: []
+      responses:
+        '200':
+          description: Serviço atualizado
+          content:
+            application/json:
+              schema:
+                type: object
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                servico:
+                  type: object
+                  properties:
+                    nome:
+                      type: string
+                      example: Carga de Gás R410A (até 30.000 BTUs)
+                    valor:
+                      type: string
+                      example: '380.00'
+                    tempo_servico:
+                      type: integer
+                      example: 75
+                      description: Tempo estimado em minutos
+    delete:
+      summary: Remove um serviço do catálogo
+      tags:
+      - Serviços
+      operationId: deleteServico
+      responses:
+        '204':
+          description: Serviço removido
+  "/api/v1/login":
+    post:
+      summary: Realiza autenticação do usuário
+      tags:
+      - Autenticação
+      description: Autentica um usuário via CPF e senha. Retorna um Bearer token de
+        sessão que deve ser usado nas demais rotas protegidas.
+      operationId: login
+      security: []
+      parameters: []
+      responses:
+        '200':
+          description: Autenticado com sucesso
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                    example: a1b2c3d4e5f6g7h8i9j0
+                  user:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      nome:
+                        type: string
+                        example: Sophia Marlene
+                      email:
+                        type: string
+                        example: sophia@example.com
+                      cpf:
+                        type: string
+                        example: '11111111111'
+                      telefone:
+                        type: string
+                        example: '73993564830'
+                      role_id:
+                        type: integer
+                        example: 1
+                      role:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 1
+                          nome:
+                            type: string
+                            example: Secretaria
+        '401':
+          description: CPF ou senha inválidos
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: CPF ou senha inválidos
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                cpf:
+                  type: string
+                  description: CPF cadastrado (aceita com ou sem pontuação)
+                  example: '11111111111'
+                password:
+                  type: string
+                  description: Senha do usuário
+                  example: '123456'
+              required:
+              - cpf
+              - password
+  "/api/v1/logout":
+    delete:
+      summary: Encerra a sessão ativa (Logout)
+      tags:
+      - Autenticação
+      description: Invalida imediatamente o token da sessão ativa no banco de dados.
+      operationId: logout
+      security:
+      - bearer_auth: []
+      responses:
+        '204':
+          description: Logout realizado com sucesso
+  "/api/v1/status":
+    get:
+      summary: Lista status disponíveis para ordens de serviço
+      tags:
+      - Status
+      description: 'Retorna a listagem de status cadastrados (ex: Aberta, Em Andamento,
+        Aguardando Peça, Finalizada).'
+      operationId: getStatusList
+      responses:
+        '200':
+          description: Lista de status retornada
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      example: 1
+                    nome:
+                      type: string
+                      example: Aberta
+    post:
+      summary: Cadastra um novo status
+      tags:
+      - Status
+      operationId: createStatus
+      parameters: []
+      responses:
+        '201':
+          description: Status criado com sucesso
+          content:
+            application/json:
+              schema:
+                type: object
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: object
+                  properties:
+                    nome:
+                      type: string
+                      example: Aguardando Aprovação de Orçamento
+                  required:
+                  - nome
+              required:
+              - status
+  "/api/v1/status/{id}":
+    parameters:
+    - name: id
+      in: path
+      description: ID único do Status
+      example: 1
+      required: true
+      schema:
+        type: integer
+    get:
+      summary: Visualiza detalhes de um status
+      tags:
+      - Status
+      operationId: getStatus
+      responses:
+        '200':
+          description: Status encontrado
+          content:
+            application/json:
+              schema:
+                type: object
+    patch:
+      summary: Atualiza o nome de um status
+      tags:
+      - Status
+      operationId: updateStatus
+      parameters: []
+      responses:
+        '200':
+          description: Status atualizado
+          content:
+            application/json:
+              schema:
+                type: object
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: object
+                  properties:
+                    nome:
+                      type: string
+                      example: Em Andamento (Técnico em Deslocamento)
+    delete:
+      summary: Remove um status
+      tags:
+      - Status
+      operationId: deleteStatus
+      responses:
+        '204':
+          description: Status removido
+  "/api/v1/users":
+    get:
+      summary: Lista usuários do sistema
+      tags:
+      - Usuários
+      description: Retorna a lista de usuários e seus respectivos papéis. Restrito
+        a Administradores e Secretárias.
+      operationId: getUsers
+      responses:
+        '200':
+          description: Lista de usuários retornada
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      example: 1
+                    nome:
+                      type: string
+                      example: Letícia Andreia
+                    cpf:
+                      type: string
+                      example: '33333333333'
+                    email:
+                      type: string
+                      example: leticia@example.com
+                    telefone:
+                      type: string
+                      example: '11997499375'
+                    role_id:
+                      type: integer
+                      example: 3
+                    role:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 3
+                        nome:
+                          type: string
+                          example: Administrador
+        '403':
+          description: Acesso negado (Técnicos não podem listar todos os usuários)
+          content:
+            application/json:
+              schema:
+                type: object
+    post:
+      summary: Cadastra um novo usuário
+      tags:
+      - Usuários
+      description: Cria um novo usuário e define seu papel no sistema (apenas Administradores).
+      operationId: createUser
+      parameters: []
+      responses:
+        '201':
+          description: Usuário criado com sucesso
+          content:
+            application/json:
+              schema:
+                type: object
+        '422':
+          description: 'Erro de validação (ex: CPF já cadastrado ou campos faltantes)'
+          content:
+            application/json:
+              schema:
+                type: object
+        '403':
+          description: Acesso negado
+          content:
+            application/json:
+              schema:
+                type: object
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user:
+                  type: object
+                  properties:
+                    nome:
+                      type: string
+                      example: Rodrigo Mendonça
+                    cpf:
+                      type: string
+                      example: '66677788899'
+                    email:
+                      type: string
+                      example: rodrigo.tecnico@example.com
+                    telefone:
+                      type: string
+                      example: '11987654321'
+                    password:
+                      type: string
+                      example: senhaSegura#2026
+                    role_id:
+                      type: integer
+                      description: '1: Secretaria, 2: Técnico, 3: Administrador'
+                      example: 2
+                  required:
+                  - nome
+                  - cpf
+                  - password
+                  - role_id
+              required:
+              - user
+  "/api/v1/users/{id}":
+    parameters:
+    - name: id
+      in: path
+      description: ID único do Usuário
+      example: 1
+      required: true
+      schema:
+        type: integer
+    get:
+      summary: Visualiza detalhes de um usuário
+      tags:
+      - Usuários
+      operationId: getUser
+      responses:
+        '200':
+          description: Usuário localizado
+          content:
+            application/json:
+              schema:
+                type: object
+        '404':
+          description: Usuário não encontrado
+          content:
+            application/json:
+              schema:
+                type: object
+    patch:
+      summary: Atualiza dados de um usuário
+      tags:
+      - Usuários
+      description: Atualiza informações do usuário. Apenas Administradores podem alterar
+        o role_id; usuários comuns só podem editar seus próprios dados básicos (telefone,
+        email, senha).
+      operationId: updateUser
+      parameters: []
+      responses:
+        '200':
+          description: Usuário atualizado
+          content:
+            application/json:
+              schema:
+                type: object
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user:
+                  type: object
+                  properties:
+                    nome:
+                      type: string
+                      example: Rodrigo Mendonça Jr
+                    telefone:
+                      type: string
+                      example: '11999998888'
+                    email:
+                      type: string
+                      example: rodrigo.novo@example.com
+                    password:
+                      type: string
+                      example: novaSenha#2026
+                    role_id:
+                      type: integer
+                      example: 2
+    delete:
+      summary: Remove um usuário
+      tags:
+      - Usuários
+      description: Exclui um usuário do sistema (apenas Administradores, não sendo
+        permitido auto-exclusão).
+      operationId: deleteUser
+      responses:
+        '204':
+          description: Usuário excluído
+        '403':
+          description: Acesso negado
+          content:
+            application/json:
+              schema:
+                type: object
