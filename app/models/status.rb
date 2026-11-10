@@ -1,8 +1,10 @@
 # frozen_string_literal: true
 
 class Status < ApplicationRecord
-  has_many :ordem_servicos, foreign_key: :status_id, dependent: :restrict_with_error, inverse_of: :status
-  has_many :tarefas, foreign_key: :status_id, dependent: :restrict_with_error, inverse_of: :status
+  normalizes :nome, with: ->(n) { n.to_s.strip }
 
-  validates :nome, presence: true
+  has_many :ordem_servicos, dependent: :restrict_with_error, inverse_of: :status
+  has_many :tarefas, dependent: :restrict_with_error, inverse_of: :status
+
+  validates :nome, presence: true, uniqueness: { case_sensitive: false }
 end

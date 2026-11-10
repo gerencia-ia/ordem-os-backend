@@ -130,6 +130,17 @@ ActiveRecord::Schema[8.0].define(version: 2026_10_24_180000) do
     t.index ["categorias_servico_id"], name: "index_servicos_on_categorias_servico_id"
   end
 
+  create_table "sessions", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.string "token", null: false
+    t.string "ip_address"
+    t.string "user_agent"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["token"], name: "index_sessions_on_token", unique: true
+    t.index ["user_id"], name: "index_sessions_on_user_id"
+  end
+
   create_table "status", force: :cascade do |t|
     t.string "nome"
     t.datetime "created_at", null: false
@@ -196,6 +207,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_10_24_180000) do
   add_foreign_key "os_tecnicos", "ordem_servicos"
   add_foreign_key "os_tecnicos", "tecnicos"
   add_foreign_key "servicos", "categorias_servicos"
+  add_foreign_key "sessions", "users"
   add_foreign_key "tarefas", "ordem_servicos"
   add_foreign_key "tarefas", "tecnicos"
   add_foreign_key "telefones", "clientes"

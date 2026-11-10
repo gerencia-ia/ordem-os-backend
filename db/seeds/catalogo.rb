@@ -7,10 +7,8 @@ puts "Criando catálogo..."
 # ============================================================
 
 [
-  "Aberta",
   "Não iniciada",
   "Em andamento",
-  "Aguardando",
   "Concluída",
   "Cancelada"
 ].each do |nome|
@@ -27,7 +25,9 @@ end
   "Alta",
   "Urgente"
 ].each do |descricao|
-  Prioridade.find_or_create_by!(descricao: descricao)
+  prioridade = Prioridade.where("LOWER(descricao) = ?", descricao.downcase).first_or_initialize
+  prioridade.descricao = descricao
+  prioridade.save!
 end
 
 # ============================================================

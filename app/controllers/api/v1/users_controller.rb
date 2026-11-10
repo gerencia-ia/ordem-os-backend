@@ -1,48 +1,47 @@
+# frozen_string_literal: true
+
 module Api
   module V1
     class UsersController < BaseController
       before_action :set_user, only: [ :show, :update, :destroy ]
 
       def index
+        authorize! User
         users = User.includes(:role).all
 
         render json: users
       end
 
       def show
-        user = User.find(params[:id])
+        authorize! @user
 
-        render json: user
+        render json: @user
       end
 
       def create
+        authorize! User
         user = User.new(user_params)
 
         if user.save
           render json: user, status: :created
         else
-          render json: {
-            errors: user.errors.full_messages
-          }, status: :unprocessable_entity
+          render_validation_errors(user)
         end
       end
 
       def update
-        user = User.find(params[:id])
+        authorize! @user
 
-        if user.update(user_params)
-          render json: user
+        if @user.update(user_params)
+          render json: @user
         else
-          render json: {
-            errors: user.errors.full_messages
-          }, status: :unprocessable_entity
+          render_validation_errors(@user)
         end
       end
 
       def destroy
-        user = User.find(params[:id])
-
-        user.destroy
+        authorize! @user
+        @user.destroy
 
         head :no_content
       end
@@ -56,14 +55,15 @@ module Api
       end
 
       def user_params
-        params.require(:user).permit(
-          :nome,
-          :cpf,
-          :email,
-          :telefone,
-          :role_id,
-          :password
-        )
+        data = params[:user].present? ? params.require(:user) : params
+
+        permitted_attributes = [ :nome, :cpf, :email, :telefone, :password ]
+        permitted_attributes << :role_id if current_user&.admin?
+
+        p = data.permit(permitted_attributes)
+        p.delete(:password) if p[:password].blank?
+
+        p
       end
     end
   end

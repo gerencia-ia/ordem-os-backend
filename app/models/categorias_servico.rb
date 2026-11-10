@@ -1,7 +1,11 @@
 # frozen_string_literal: true
 
 class CategoriasServico < ApplicationRecord
-  has_many :servicos, foreign_key: :categorias_servico_id, dependent: :restrict_with_error, inverse_of: :categorias_servico
+  normalizes :descricao, with: ->(d) { d.to_s.strip }
 
-  validates :descricao, presence: true, uniqueness: true
+  has_many :servicos, dependent: :restrict_with_error, inverse_of: :categorias_servico
+
+  validates :descricao, presence: true, uniqueness: { case_sensitive: false }
+
+  scope :ordenadas, -> { order(:descricao) }
 end

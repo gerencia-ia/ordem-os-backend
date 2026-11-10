@@ -1,9 +1,13 @@
 # frozen_string_literal: true
 
 class Equipamento < ApplicationRecord
-  belongs_to :cliente, foreign_key: :cliente_id, inverse_of: :equipamentos
-  has_many :os_equipamentos, foreign_key: :equipamento_id, dependent: :destroy, inverse_of: :equipamento
+  normalizes :marca, :local_instalacao, :observacao, with: ->(s) { s&.strip }
+
+  belongs_to :cliente, inverse_of: :equipamentos
+  has_many :os_equipamentos, dependent: :restrict_with_error, inverse_of: :equipamento
   has_many :ordem_servicos, through: :os_equipamentos, source: :ordem_servico
 
-  validates :marca, :btus, :local_instalacao, presence: true
+  validates :marca, :local_instalacao, presence: true
+
+  scope :por_cliente, ->(cliente_id) { where(cliente_id: cliente_id) }
 end

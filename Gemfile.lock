@@ -1,6 +1,8 @@
 GEM
   remote: https://rubygems.org/
   specs:
+    action_policy (0.7.8)
+      ruby-next-core (>= 1.0)
     actioncable (8.0.4)
       actionpack (= 8.0.4)
       activesupport (= 8.0.4)
@@ -123,8 +125,6 @@ GEM
       addressable (~> 2.8)
       bigdecimal (>= 3.1, < 5)
     jsonapi-renderer (0.2.2)
-    jwt (3.1.2)
-      base64
     kamal (2.8.2)
       activesupport (>= 7.0)
       base64 (~> 0.2)
@@ -306,6 +306,7 @@ GEM
       rubocop (>= 1.72)
       rubocop-performance (>= 1.24)
       rubocop-rails (>= 2.30)
+    ruby-next-core (1.2.1)
     ruby-progressbar (1.13.0)
     securerandom (0.4.1)
     sshkit (1.24.0)
@@ -346,6 +347,7 @@ PLATFORMS
   x86_64-linux-musl
 
 DEPENDENCIES
+  action_policy
   active_model_serializers (~> 0.10.2)
   bcrypt (~> 3.1.7)
   bootsnap
@@ -353,7 +355,6 @@ DEPENDENCIES
   byebug
   debug
   dotenv-rails
-  jwt
   kamal
   pg (~> 1.1)
   puma (>= 5.0)

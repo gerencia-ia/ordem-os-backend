@@ -3,35 +3,40 @@
 module Api
   module V1
     class ServicosController < BaseController
-      before_action :set_servico, only: [:show, :update, :destroy]
+      before_action :set_servico, only: [ :show, :update, :destroy ]
 
       def index
+        authorize! Servico
         @servicos = Servico.includes(:categorias_servico).all
         render json: @servicos, include: :categorias_servico
       end
 
       def show
+        authorize! @servico
         render json: @servico
       end
 
       def create
+        authorize! Servico
         @servico = Servico.new(servico_params)
         if @servico.save
           render json: @servico, status: :created
         else
-          render json: @servico.errors, status: :unprocessable_entity
+          render_validation_errors(@servico)
         end
       end
 
       def update
+        authorize! @servico
         if @servico.update(servico_params)
           render json: @servico
         else
-          render json: @servico.errors, status: :unprocessable_entity
+          render_validation_errors(@servico)
         end
       end
 
       def destroy
+        authorize! @servico
         @servico.destroy
         head :no_content
       end

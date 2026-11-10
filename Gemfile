@@ -35,7 +35,10 @@ gem "thruster", require: false
 # Use Rack CORS for handling Cross-Origin Resource Sharing (CORS), making cross-origin Ajax possible
 gem "rack-cors"
 gem "active_model_serializers", "~> 0.10.2"
-gem "jwt"
+
+# Authorization with caching and high performance
+gem "action_policy"
+
 
 gem "rswag-api"
 gem "rswag-ui"
