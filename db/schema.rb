@@ -64,6 +64,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_11_08_130000) do
     t.datetime "updated_at", null: false
     t.string "numero_ordem"
     t.string "descricao"
+    t.string "tipo_servico"
     t.date "data_vencimento"
     t.decimal "custo_estimado", precision: 10, scale: 2
     t.bigint "cliente_id"
@@ -92,16 +93,19 @@ ActiveRecord::Schema[8.0].define(version: 2026_11_08_130000) do
     t.decimal "quantidade"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "nome_servico"
+    t.decimal "valor_unitario", precision: 10, scale: 2
     t.index ["ordem_servico_id"], name: "index_os_servicos_on_ordem_servico_id"
     t.index ["servico_id"], name: "index_os_servicos_on_servico_id"
   end
 
   create_table "os_tecnicos", force: :cascade do |t|
     t.bigint "ordem_servico_id"
-    t.bigint "user_id"
+    t.bigint "tecnico_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["ordem_servico_id"], name: "index_os_tecnicos_on_ordem_servico_id"
+    t.index ["tecnico_id"], name: "index_os_tecnicos_on_tecnico_id"
   end
 
   create_table "prioridades", force: :cascade do |t|
@@ -146,14 +150,26 @@ ActiveRecord::Schema[8.0].define(version: 2026_11_08_130000) do
   create_table "tarefas", force: :cascade do |t|
     t.bigint "ordem_servico_id", null: false
     t.string "descricao"
-    t.bigint "status_id", null: false
-    t.bigint "user_id"
+    t.string "status", default: "nao_iniciada"
+    t.bigint "tecnico_id"
     t.datetime "data_inicio"
     t.datetime "data_fim"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["ordem_servico_id"], name: "index_tarefas_on_ordem_servico_id"
-    t.index ["status_id"], name: "index_tarefas_on_status_id"
+    t.index ["tecnico_id"], name: "index_tarefas_on_tecnico_id"
+  end
+
+  create_table "tecnicos", force: :cascade do |t|
+    t.string "nome"
+    t.string "telefone"
+    t.string "especialidades", array: true
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "email"
+    t.string "status_disponibilidade", default: "disponivel"
+    t.string "cpf", null: false
+    t.index ["cpf"], name: "index_tecnicos_on_cpf", unique: true
   end
 
   create_table "telefones", force: :cascade do |t|
@@ -165,14 +181,15 @@ ActiveRecord::Schema[8.0].define(version: 2026_11_08_130000) do
   end
 
   create_table "users", force: :cascade do |t|
-    t.string "nome"
     t.string "cpf", null: false
-    t.string "email"
-    t.string "telefone"
-    t.bigint "role_id"
     t.string "password_digest", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "role", default: 0, null: false
+    t.bigint "role_id"
+    t.string "nome"
+    t.string "email"
+    t.string "telefone"
     t.index ["cpf"], name: "index_users_on_cpf", unique: true
     t.index ["role_id"], name: "index_users_on_role_id"
   end
@@ -188,12 +205,11 @@ ActiveRecord::Schema[8.0].define(version: 2026_11_08_130000) do
   add_foreign_key "os_servicos", "ordem_servicos"
   add_foreign_key "os_servicos", "servicos"
   add_foreign_key "os_tecnicos", "ordem_servicos"
-  add_foreign_key "os_tecnicos", "users"
+  add_foreign_key "os_tecnicos", "tecnicos"
   add_foreign_key "servicos", "categorias_servicos"
   add_foreign_key "sessions", "users"
   add_foreign_key "tarefas", "ordem_servicos"
-  add_foreign_key "tarefas", "status"
-  add_foreign_key "tarefas", "users"
+  add_foreign_key "tarefas", "tecnicos"
   add_foreign_key "telefones", "clientes"
   add_foreign_key "users", "roles"
 end
