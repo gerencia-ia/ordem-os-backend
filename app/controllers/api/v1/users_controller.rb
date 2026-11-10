@@ -61,7 +61,8 @@ module Api
           :cpf,
           :email,
           :telefone,
-          :role_id
+          :role_id,
+          :password
         )
       end
     end

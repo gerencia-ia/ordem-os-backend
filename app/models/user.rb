@@ -9,4 +9,5 @@ class User < ApplicationRecord
   belongs_to :role
 
   validates :cpf, presence: true, uniqueness: true
+  validates :password, length: { minimum: 6 }, allow_nil: true
 end

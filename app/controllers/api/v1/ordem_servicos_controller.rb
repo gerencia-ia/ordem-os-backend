@@ -97,6 +97,8 @@ module Api
 
         os_servico = @ordem_servico.os_servicos.find_or_initialize_by(servico_id: servico.id)
         os_servico.quantidade = params[:quantidade] if params[:quantidade].present?
+        os_servico.nome_servico ||= servico.nome
+        os_servico.valor_unitario ||= servico.valor
 
         if os_servico.save
           render json: {
