@@ -12,11 +12,11 @@ class OsServicoSerializer < ActiveModel::Serializer
   end
 
   def nome
-    object.servico&.nome
+    object.nome_servico.presence || object.servico&.nome
   end
 
   def valor
-    object.servico&.valor
+    object.valor_unitario || object.servico&.valor
   end
 
   def tempo_servico
