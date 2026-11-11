@@ -1,0 +1,216 @@
+# frozen_string_literal: true
+
+require "rails_helper"
+
+RSpec.describe "Api::<%= api_version_module %>::<%= controller_class_name %>", type: :request do
+  let!(:role_admin) { Role.find_or_create_by!(nome: "Administrador") }
+  let!(:role_tecnico) { Role.find_or_create_by!(nome: "Técnico") }
+
+  let!(:admin) do
+    User.create!(
+      nome: "Admin Teste",
+      cpf: "11111111111",
+      email: "admin@teste.com",
+      telefone: "11999999999",
+      password: "password123",
+      role: role_admin
+    )
+  end
+
+  let!(:tecnico) do
+    User.create!(
+      nome: "Tecnico Teste",
+      cpf: "22222222222",
+      email: "tecnico@teste.com",
+      telefone: "11988888888",
+      password: "password123",
+      role: role_tecnico
+    )
+  end
+<% ref_attrs = attributes.select(&:reference?) -%>
+<% non_ref_attrs = attributes.reject(&:reference?) -%>
+<% valid_pairs = non_ref_attrs.map { |attr| "#{attr.column_name}: #{sample_value_literal(attr)}" } -%>
+<% update_pairs = non_ref_attrs.map { |attr| "#{attr.column_name}: #{sample_value_literal(attr, updated: true)}" } -%>
+<% invalid_attr = non_ref_attrs.find { |a| !a.password_digest? && !a.token? } || attributes.first -%>
+
+  let(:valid_attributes) do
+<% if valid_pairs.any? -%>
+    {
+<% valid_pairs.each_with_index do |pair, idx| -%>
+      <%= pair %><%= "," unless idx == valid_pairs.size - 1 %>
+<% end -%>
+    }
+<% else -%>
+    {}
+<% end -%>
+  end
+
+  let(:update_attributes) do
+<% if update_pairs.any? -%>
+    {
+<% update_pairs.each_with_index do |pair, idx| -%>
+      <%= pair %><%= "," unless idx == update_pairs.size - 1 %>
+<% end -%>
+    }
+<% else -%>
+    {}
+<% end -%>
+  end
+<% if invalid_attr -%>
+
+  let(:invalid_attributes) do
+    {
+      <%= invalid_attr.column_name %>: nil
+    }
+  end
+<% end -%>
+
+  def auth_header(user)
+    session = user.sessions.create!
+    { "Authorization" => "Bearer #{session.token}" }
+  end
+
+  describe "autenticação e autorização" do
+    it "retorna 401 quando enviado sem token" do
+      get "<%= api_route_path %>"
+      expect(response).to have_http_status(:unauthorized)
+    end
+
+    it "retorna 403 quando usuário não administrador acessa o recurso" do
+      get "<%= api_route_path %>", headers: auth_header(tecnico)
+      expect(response).to have_http_status(:forbidden)
+    end
+  end
+
+  describe "GET <%= api_route_path %>" do
+<% if ref_attrs.any? -%>
+    it "lista os registros para administrador" do
+      pending "Associe os registros pais obrigatórios em valid_attributes"
+      record = <%= model_class_name %>.create!(valid_attributes)
+      get "<%= api_route_path %>", headers: auth_header(admin)
+
+      expect(response).to have_http_status(:ok)
+      body = JSON.parse(response.body)
+      expect(body.map { |item| item["id"] }).to include(record.id)
+    end
+<% else -%>
+    let!(:record) { <%= model_class_name %>.create!(valid_attributes) }
+
+    it "lista os registros para administrador" do
+      get "<%= api_route_path %>", headers: auth_header(admin)
+
+      expect(response).to have_http_status(:ok)
+      body = JSON.parse(response.body)
+      expect(body.map { |item| item["id"] }).to include(record.id)
+    end
+<% end -%>
+  end
+
+  describe "GET <%= api_route_path %>/:id" do
+<% if ref_attrs.any? -%>
+    it "retorna o registro solicitado" do
+      pending "Associe os registros pais obrigatórios em valid_attributes"
+      record = <%= model_class_name %>.create!(valid_attributes)
+      get "<%= api_route_path %>/#{record.id}", headers: auth_header(admin)
+
+      expect(response).to have_http_status(:ok)
+      body = JSON.parse(response.body)
+      expect(body["id"]).to eq(record.id)
+    end
+<% else -%>
+    let!(:record) { <%= model_class_name %>.create!(valid_attributes) }
+
+    it "retorna o registro solicitado" do
+      get "<%= api_route_path %>/#{record.id}", headers: auth_header(admin)
+
+      expect(response).to have_http_status(:ok)
+      body = JSON.parse(response.body)
+      expect(body["id"]).to eq(record.id)
+    end
+<% end -%>
+
+    it "retorna 404 quando não encontrado" do
+      get "<%= api_route_path %>/0", headers: auth_header(admin)
+      expect(response).to have_http_status(:not_found)
+    end
+  end
+
+  describe "POST <%= api_route_path %>" do
+    it "cria um novo registro com parâmetros válidos" do
+<% if ref_attrs.any? -%>
+      pending "Associe os registros pais obrigatórios em valid_attributes"
+<% end -%>
+      expect do
+        post "<%= api_route_path %>",
+             params: { <%= singular_resource_name %>: valid_attributes },
+             headers: auth_header(admin),
+             as: :json
+      end.to change(<%= model_class_name %>, :count).by(1)
+
+      expect(response).to have_http_status(:created)
+    end
+<% if invalid_attr -%>
+
+    it "retorna 422 com parâmetros inválidos" do
+      post "<%= api_route_path %>",
+           params: { <%= singular_resource_name %>: invalid_attributes },
+           headers: auth_header(admin),
+           as: :json
+
+      expect(response).to have_http_status(:unprocessable_content)
+      body = JSON.parse(response.body)
+      expect(body).to have_key("errors")
+    end
+<% end -%>
+  end
+
+  describe "PATCH <%= api_route_path %>/:id" do
+<% if ref_attrs.any? -%>
+    it "atualiza o registro com sucesso" do
+      pending "Associe os registros pais obrigatórios em valid_attributes"
+      record = <%= model_class_name %>.create!(valid_attributes)
+      patch "<%= api_route_path %>/#{record.id}",
+            params: { <%= singular_resource_name %>: update_attributes },
+            headers: auth_header(admin),
+            as: :json
+
+      expect(response).to have_http_status(:ok)
+    end
+<% else -%>
+    let!(:record) { <%= model_class_name %>.create!(valid_attributes) }
+
+    it "atualiza o registro com sucesso" do
+      patch "<%= api_route_path %>/#{record.id}",
+            params: { <%= singular_resource_name %>: update_attributes },
+            headers: auth_header(admin),
+            as: :json
+
+      expect(response).to have_http_status(:ok)
+    end
+<% end -%>
+  end
+
+  describe "DELETE <%= api_route_path %>/:id" do
+<% if ref_attrs.any? -%>
+    it "remove o registro com sucesso" do
+      pending "Associe os registros pais obrigatórios em valid_attributes"
+      record = <%= model_class_name %>.create!(valid_attributes)
+      expect do
+        delete "<%= api_route_path %>/#{record.id}", headers: auth_header(admin)
+      end.to change(<%= model_class_name %>, :count).by(-1)
+
+      expect(response).to have_http_status(:no_content)
+    end
+<% else -%>
+    let!(:record) { <%= model_class_name %>.create!(valid_attributes) }
+
+    it "remove o registro com sucesso" do
+      expect do
+        delete "<%= api_route_path %>/#{record.id}", headers: auth_header(admin)
+      end.to change(<%= model_class_name %>, :count).by(-1)
+
+      expect(response).to have_http_status(:no_content)
+    end
+<% end -%>
+  end
+end

@@ -1,0 +1,26 @@
+# frozen_string_literal: true
+
+class <%= class_name %> < ApplicationRecord
+<% string_attrs = attributes.select { |a| %i[string text].include?(a.type) && !a.password_digest? && !a.token? } -%>
+<% ref_attrs = attributes.select(&:reference?) -%>
+<% required_attrs = attributes.reject { |a| a.reference? || a.type == :boolean || a.password_digest? || a.token? } -%>
+<% bool_attrs = attributes.select { |a| a.type == :boolean } -%>
+<% if string_attrs.any? -%>
+  normalizes <%= string_attrs.map { |a| ":#{a.name}" }.join(", ") %>, with: ->(value) { value&.strip }
+<% end -%>
+<% if ref_attrs.any? -%>
+<%= "\n" if string_attrs.any? -%>
+<% ref_attrs.each do |attribute| -%>
+  belongs_to :<%= attribute.name %><%= ", polymorphic: true" if attribute.polymorphic? %>
+<% end -%>
+<% end -%>
+<% if required_attrs.any? || bool_attrs.any? -%>
+<%= "\n" if string_attrs.any? || ref_attrs.any? -%>
+<% if required_attrs.any? -%>
+  validates <%= required_attrs.map { |a| ":#{a.name}" }.join(", ") %>, presence: true
+<% end -%>
+<% bool_attrs.each do |attribute| -%>
+  validates :<%= attribute.name %>, inclusion: { in: [ true, false ] }
+<% end -%>
+<% end -%>
+end

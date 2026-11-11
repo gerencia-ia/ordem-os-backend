@@ -6,13 +6,12 @@ RSpec.configure do |config|
   # Specify a root folder where Swagger JSON files are generated
   config.openapi_root = Rails.root.join("swagger").to_s
 
-  # Define one or more Swagger documents and provide global metadata for each one
-  config.openapi_specs = {
-    "v1/swagger.yaml" => {
+  build_openapi_spec = lambda do |api_version|
+    {
       openapi: "3.0.1",
       info: {
         title: "Ordem OS API",
-        version: "v1",
+        version: api_version,
         description: <<~DESC
           API REST para gerenciamento de Ordens de Serviço, Clientes, Equipamentos e Catálogo.
 
@@ -51,6 +50,11 @@ RSpec.configure do |config|
       ],
       paths: {}
     }
+  end
+
+  # Define one or more Swagger documents and provide global metadata for each one
+  config.openapi_specs = {
+    "v1/swagger.yaml" => build_openapi_spec.call("v1")
   }
 
   config.openapi_format = :yaml

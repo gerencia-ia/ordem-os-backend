@@ -14,7 +14,24 @@ module OrdemOsApi
     # Please, add to the `ignore` list any other `lib` subdirectories that do
     # not contain `.rb` files, or that should not be reloaded or eager loaded.
     # Common ones are `templates`, `generators`, or `middleware`, for example.
-    config.autoload_lib(ignore: %w[assets tasks])
+    config.autoload_lib(ignore: %w[assets tasks generators templates])
+
+    config.x.api_version = "v1"
+
+    config.generators do |g|
+      g.orm :active_record
+      g.test_framework :rspec,
+                       fixtures: false,
+                       view_specs: false,
+                       helper_specs: false,
+                       routing_specs: false,
+                       controller_specs: false,
+                       request_specs: true
+      g.scaffold_controller :api
+      g.resource_route false
+      g.assets false
+      g.helper false
+    end
 
     # Configuration for the application, engines, and railties goes here.
     #

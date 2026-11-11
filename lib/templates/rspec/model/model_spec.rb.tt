@@ -1,0 +1,84 @@
+# frozen_string_literal: true
+
+require "rails_helper"
+
+<% target_class = respond_to?(:model_class_name, true) ? model_class_name : class_name -%>
+<% ref_attrs = attributes.select(&:reference?) -%>
+<% non_ref_attrs = attributes.reject(&:reference?) -%>
+<% string_attrs = attributes.select { |a| %i[string text].include?(a.type) && !a.password_digest? && !a.token? } -%>
+<% required_attrs = non_ref_attrs.reject { |a| a.type == :boolean || a.password_digest? || a.token? } -%>
+<% sample_for = ->(attr) do
+  case attr.type
+  when :integer, :bigint then "1"
+  when :float, :decimal then "10.5"
+  when :boolean then "true"
+  when :date then '"2026-01-15"'
+  when :datetime, :timestamp then '"2026-01-15T10:00:00Z"'
+  else %("Exemplo #{attr.name}")
+  end
+end -%>
+RSpec.describe <%= target_class %>, type: :model do
+<% if non_ref_attrs.any? -%>
+  let(:valid_attributes) do
+    {
+<% non_ref_attrs.each_with_index do |attr, idx| -%>
+      <%= attr.name %>: <%= sample_for.call(attr) %><%= "," unless idx == non_ref_attrs.size - 1 %>
+<% end -%>
+    }
+  end
+
+<% end -%>
+  describe "validações" do
+<% if ref_attrs.any? -%>
+    it "é válido com atributos e associações válidas" do
+      pending "Associe os registros pais obrigatórios em valid_attributes"
+<% if non_ref_attrs.any? -%>
+      record = described_class.new(valid_attributes)
+<% else -%>
+      record = described_class.new
+<% end -%>
+      expect(record).to be_valid
+    end
+<% elsif non_ref_attrs.any? -%>
+    it "é válido com atributos válidos" do
+      record = described_class.new(valid_attributes)
+      expect(record).to be_valid
+    end
+<% else -%>
+    it "é válido" do
+      expect(described_class.new).to be_valid
+    end
+<% end -%>
+<% if required_attrs.any? -%>
+
+    it "exige preenchimento dos campos obrigatórios" do
+      record = described_class.new
+      expect(record).not_to be_valid
+<% required_attrs.each do |attr| -%>
+      expect(record.errors[:<%= attr.name %>]).to be_present
+<% end -%>
+    end
+<% end -%>
+  end
+<% if ref_attrs.any? -%>
+
+  describe "associações" do
+<% ref_attrs.each do |attr| -%>
+    it "pertence a <%= attr.name %>" do
+      association = described_class.reflect_on_association(:<%= attr.name %>)
+      expect(association&.macro).to eq(:belongs_to)
+    end
+<% end -%>
+  end
+<% end -%>
+<% if string_attrs.any? -%>
+
+  describe "normalizações" do
+    it "remove espaços em branco nas extremidades de strings" do
+<% first_str = string_attrs.first -%>
+      record = described_class.new(<%= first_str.name %>: "   Valor Teste   ")
+      expect(record.<%= first_str.name %>).to eq("Valor Teste")
+    end
+  end
+<% end -%>
+end

@@ -1,0 +1,34 @@
+# frozen_string_literal: true
+
+class <%= migration_class_name %> < ActiveRecord::Migration[<%= ActiveRecord::Migration.current_version %>]
+  def change
+<%- if migration_action == "add" -%>
+<%- attributes.each do |attribute| -%>
+  <%- if attribute.reference? -%>
+    add_reference :<%= table_name %>, :<%= attribute.name %><%= attribute.inject_options %><%= foreign_key_type %>
+  <%- elsif attribute.polymorphic? -%>
+    add_reference :<%= table_name %>, :<%= attribute.name %>, polymorphic: true<%= attribute.inject_options %>
+  <%- else -%>
+    add_column :<%= table_name %>, :<%= attribute.name %>, :<%= attribute.type %><%= attribute.inject_options %>
+  <%- end -%>
+  <%- if attribute.has_index? -%>
+    add_index :<%= table_name %>, :<%= attribute.index_name %><%= attribute.inject_index_options %>
+  <%- end -%>
+<%- end -%>
+<%- elsif migration_action == "join" -%>
+    create_join_table :<%= join_tables.first %>, :<%= join_tables.second %> do |t|
+    <%- attributes.each do |attribute| -%>
+      <%= "# " unless attribute.has_index? -%>t.index <%= attribute.reference? ? ":#{attribute.name}_id" : ":#{attribute.name}" %>
+    <%- end -%>
+    end
+<%- elsif migration_action == "remove" -%>
+<%- attributes.each do |attribute| -%>
+  <%- if attribute.reference? -%>
+    remove_reference :<%= table_name %>, :<%= attribute.name %><%= attribute.inject_options %><%= foreign_key_type %>
+  <%- else -%>
+    remove_column :<%= table_name %>, :<%= attribute.name %>, :<%= attribute.type %><%= attribute.inject_options %>
+  <%- end -%>
+<%- end -%>
+<%- end -%>
+  end
+end

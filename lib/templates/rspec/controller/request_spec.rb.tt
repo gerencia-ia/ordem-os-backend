@@ -1,0 +1,1 @@
+<%= ERB.new(Rails.root.join("lib/templates/rspec/request/request_spec.rb.tt").read, trim_mode: "-").result(binding) %>

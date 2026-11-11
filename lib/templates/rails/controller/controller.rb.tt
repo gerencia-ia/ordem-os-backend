@@ -1,0 +1,22 @@
+# frozen_string_literal: true
+
+<% parent_class =
+     if class_path.size >= 2 && class_path[0] == "api" && class_path[1].match?(/\Av\d+\z/)
+       version_dir = class_path[1]
+       if File.exist?(Rails.root.join("app/controllers/api", version_dir, "base_controller.rb"))
+         "Api::#{version_dir.camelize}::BaseController"
+       else
+         "ApplicationController"
+       end
+     else
+       "ApplicationController"
+     end -%>
+<% module_namespacing do -%>
+class <%= class_name %>Controller < <%= parent_class %>
+<% actions.each_with_index do |action, idx| -%>
+  def <%= action %>
+  end
+<%= "\n" unless idx == actions.size - 1 -%>
+<% end -%>
+end
+<% end -%>

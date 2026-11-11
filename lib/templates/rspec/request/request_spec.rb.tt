@@ -1,0 +1,43 @@
+# frozen_string_literal: true
+
+require "rails_helper"
+
+RSpec.describe "<%= class_name %>", type: :request do
+  let!(:role_admin) { Role.find_or_create_by!(nome: "Administrador") }
+  let!(:admin) do
+    User.create!(
+      nome: "Admin Teste",
+      cpf: "11111111111",
+      email: "admin@teste.com",
+      telefone: "11999999999",
+      password: "password123",
+      role: role_admin
+    )
+  end
+
+  def auth_header(user)
+    session = user.sessions.create!
+    { "Authorization" => "Bearer #{session.token}" }
+  end
+<% controller_actions = respond_to?(:actions, true) ? actions : [] -%>
+<% if controller_actions.any? -%>
+
+<% controller_actions.each_with_index do |action, idx| -%>
+  describe "GET /<%= file_path %>/<%= action %>" do
+    it "retorna resposta com sucesso para usuário autenticado" do
+      get "/<%= file_path %>/<%= action %>", headers: auth_header(admin)
+      expect(response).to have_http_status(:success)
+    end
+  end
+<%= "\n" unless idx == controller_actions.size - 1 -%>
+<% end -%>
+<% else -%>
+
+  describe "GET /<%= file_path %>" do
+    it "exige autenticação" do
+      get "/<%= file_path %>"
+      expect(response).to have_http_status(:unauthorized)
+    end
+  end
+<% end -%>
+end

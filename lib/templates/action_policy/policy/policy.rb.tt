@@ -1,0 +1,24 @@
+# frozen_string_literal: true
+
+<% policy_class = respond_to?(:model_class_name, true) ? model_class_name : class_name -%>
+class <%= policy_class %>Policy < ApplicationPolicy
+  def index?
+    user&.admin?
+  end
+
+  def show?
+    user&.admin?
+  end
+
+  def create?
+    user&.admin?
+  end
+
+  def update?
+    user&.admin?
+  end
+
+  def destroy?
+    user&.admin?
+  end
+end
