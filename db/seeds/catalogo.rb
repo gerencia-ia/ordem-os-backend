@@ -120,9 +120,57 @@ servicos.each do |attrs|
   end
 end
 
+# ============================================================
+# MATERIAIS
+# ============================================================
+
+materiais = [
+  {
+    nome: "Gás refrigerante R410A",
+    descricao: "Carga de fluido refrigerante R410A para sistemas split e inverter.",
+    valor_referencia: 140.00
+  },
+  {
+    nome: "Tubulação de cobre 1/4 pol.",
+    descricao: "Metro de tubo de cobre flexível para linha frigorígena.",
+    valor_referencia: 45.00
+  },
+  {
+    nome: "Isolamento térmico esponjoso",
+    descricao: "Metro de isolante térmico blindado para tubulação de ar-condicionado.",
+    valor_referencia: 18.50
+  },
+  {
+    nome: "Cabo PP 4 vias",
+    descricao: "Metro de cabo elétrico flexível para interligação entre evaporadora e condensadora.",
+    valor_referencia: 15.00
+  },
+  {
+    nome: "Capacitor de partida 35µF",
+    descricao: "Capacitor permanente para motor ventilador ou compressor.",
+    valor_referencia: 65.00
+  },
+  {
+    nome: "Suporte metálico para condensadora",
+    descricao: "Par de suportes reforçados com pintura eletrostática e buchas de fixação.",
+    valor_referencia: 85.00
+  }
+]
+
+materiais.each do |attrs|
+  material = Material.where("LOWER(nome) = ?", attrs[:nome].downcase).first_or_initialize
+
+  material.nome = attrs[:nome]
+  material.descricao = attrs[:descricao]
+  material.valor_referencia = attrs[:valor_referencia]
+
+  material.save!
+end
+
 puts "✓ Status: #{Status.count}"
 puts "✓ Prioridades: #{Prioridade.count}"
 puts "✓ Categorias: #{CategoriasServico.count}"
 puts "✓ Andares: #{Andar.count}"
 puts "✓ Serviços: #{Servico.count}"
 puts "✓ Valores por andar: #{ValorPorAndar.count}"
+puts "✓ Materiais: #{Material.count}"

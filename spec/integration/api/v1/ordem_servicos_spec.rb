@@ -78,6 +78,18 @@ RSpec.describe "Ordens de Serviço API", type: :request, swagger_doc: "v1/swagge
                     laudo: { type: :string, example: "Constatado acúmulo de poeira nas aletas e necessidade de troca do capacitor." }
                   }
                 }
+              },
+              os_materiais_attributes: {
+                type: :array,
+                description: "Materiais vinculados à OS (do catálogo ou avulsos)",
+                items: {
+                  type: :object,
+                  properties: {
+                    material_id: { type: :integer, nullable: true, example: 1 },
+                    nome_material: { type: :string, example: "Gás refrigerante R410A" },
+                    valor: { type: :number, format: :decimal, example: 140.0 }
+                  }
+                }
               }
             },
             required: %w[numero_ordem cliente_id endereco_id prioridade_id status_id]
@@ -294,6 +306,73 @@ RSpec.describe "Ordens de Serviço API", type: :request, swagger_doc: "v1/swagge
       end
 
       response "404", "Serviço não associado à ordem de serviço" do
+        schema type: :object
+        run_test!
+      end
+    end
+  end
+
+  path "/api/v1/ordem_servicos/{id}/materiais" do
+    parameter name: :id, in: :path, type: :integer, description: "ID da Ordem de Serviço", example: 1
+
+    post "Adiciona um material à ordem de serviço" do
+      tags "Ordens de Serviço"
+      description "Vincula um material do catálogo (via material_id) ou avulso (informando nome_material e valor) à Ordem de Serviço."
+      operationId "addMaterialToOrdem"
+      consumes "application/json"
+      produces "application/json"
+
+      parameter name: :material_params, in: :body, schema: {
+        type: :object,
+        properties: {
+          material_id: { type: :integer, nullable: true, description: "ID do material no catálogo (opcional se informar nome_material e valor)", example: 1 },
+          nome_material: { type: :string, description: "Nome do material (preenchido automaticamente se material_id for enviado)", example: "Gás refrigerante R410A" },
+          valor: { type: :number, format: :decimal, description: "Valor cobrado pelo material (usa valor_referencia do catálogo se omitido)", example: 140.0 }
+        }
+      }
+
+      response "201", "Material adicionado com sucesso" do
+        schema type: :object
+        run_test!
+      end
+
+      response "403", "Acesso negado" do
+        schema type: :object
+        run_test!
+      end
+
+      response "404", "Ordem de serviço não encontrada" do
+        schema type: :object
+        run_test!
+      end
+
+      response "422", "Erro de validação" do
+        schema type: :object
+        run_test!
+      end
+    end
+  end
+
+  path "/api/v1/ordem_servicos/{id}/materiais/{material_id}" do
+    parameter name: :id, in: :path, type: :integer, description: "ID da Ordem de Serviço", example: 1
+    parameter name: :material_id, in: :path, type: :integer, description: "ID do registro OsMaterial associado à ordem de serviço", example: 1
+
+    delete "Remove um material da ordem de serviço" do
+      tags "Ordens de Serviço"
+      description "Desvincula um item de material da Ordem de Serviço."
+      operationId "removeMaterialFromOrdem"
+      produces "application/json"
+
+      response "204", "Material removido com sucesso" do
+        run_test!
+      end
+
+      response "403", "Acesso negado" do
+        schema type: :object
+        run_test!
+      end
+
+      response "404", "Material não associado à ordem de serviço" do
         schema type: :object
         run_test!
       end
