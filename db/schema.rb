@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_10_24_180000) do
+ActiveRecord::Schema[8.0].define(version: 2026_11_10_000000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -50,6 +50,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_10_24_180000) do
     t.datetime "updated_at", null: false
     t.string "local_instalacao"
     t.string "btus"
+    t.boolean "inverter", default: false, null: false
     t.index ["cliente_id"], name: "index_equipamentos_on_cliente_id"
   end
 

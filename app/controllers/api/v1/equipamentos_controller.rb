@@ -67,7 +67,7 @@ module Api
       end
 
       def equipamento_params
-        params.require(:equipamento).permit(:marca, :btus, :local_instalacao, :observacao, :cliente_id)
+        params.require(:equipamento).permit(:marca, :btus, :inverter, :local_instalacao, :observacao, :cliente_id)
       end
     end
   end
