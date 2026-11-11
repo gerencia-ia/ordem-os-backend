@@ -7,6 +7,8 @@ Rails.application.routes.draw do
 
   namespace :api do
     namespace :v1 do
+      resources :valores_por_andares
+      resources :andares
       resources :clientes
       resources :equipamentos do
         member do

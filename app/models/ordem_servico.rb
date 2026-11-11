@@ -14,7 +14,8 @@ class OrdemServico < ApplicationRecord
   has_many :users, through: :os_tecnicos, source: :user
 
   has_many :os_servicos, dependent: :destroy, inverse_of: :ordem_servico
-  has_many :servicos, through: :os_servicos, source: :servico
+  has_many :valores_por_andares, through: :os_servicos, source: :valor_por_andar
+  has_many :servicos, through: :valores_por_andares, source: :servico
 
   has_many :os_equipamentos, dependent: :destroy, inverse_of: :ordem_servico
   has_many :equipamentos, through: :os_equipamentos, source: :equipamento
@@ -42,8 +43,9 @@ class OrdemServico < ApplicationRecord
   scope :recentes, -> { order(created_at: :desc) }
 
   def recalcular_valor_total!
-    total = os_servicos.includes(:servico).sum do |item|
-      (item.quantidade || 1) * (item.servico&.valor || 0)
+    total = os_servicos.includes(:valor_por_andar).sum do |item|
+      valor = item.valor_unitario || item.valor_por_andar&.valor || 0
+      (item.quantidade || 1) * valor
     end
     update!(valor_total: total)
   end

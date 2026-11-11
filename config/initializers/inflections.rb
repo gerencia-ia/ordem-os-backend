@@ -22,4 +22,5 @@ ActiveSupport::Inflector.inflections(:en) do |inflect|
   inflect.uncountable %w[ status ]
 
   inflect.irregular "andar", "andares"
+  inflect.irregular "valor_por_andar", "valores_por_andares"
 end

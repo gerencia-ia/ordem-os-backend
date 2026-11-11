@@ -5,7 +5,7 @@ class CreateOsServicos < ActiveRecord::Migration[6.0]
     create_table :os_servicos do |t|
       t.references :servico
       t.references :ordem_servico
-      t.decimal :quantidade
+      t.integer :quantidade, default: 1
       t.timestamps
     end
   end

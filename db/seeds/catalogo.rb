@@ -44,7 +44,26 @@ end
 end
 
 # ============================================================
-# SERVIÇOS
+# ANDARES
+# ============================================================
+
+andares_config = [
+  { descricao: "Térreo", acrescimo: 0.00 },
+  { descricao: "1º Andar", acrescimo: 30.00 },
+  { descricao: "2º Andar", acrescimo: 60.00 },
+  { descricao: "3º Andar", acrescimo: 90.00 }
+]
+
+andares = andares_config.map do |attrs|
+  andar = Andar.where("LOWER(descricao) = ?", attrs[:descricao].downcase).first_or_initialize
+  andar.descricao = attrs[:descricao]
+  andar.save!
+
+  { record: andar, acrescimo: attrs[:acrescimo] }
+end
+
+# ============================================================
+# SERVIÇOS E VALORES POR ANDAR
 # ============================================================
 
 categorias = {
@@ -57,41 +76,53 @@ categorias = {
 servicos = [
   {
     nome: "Instalação de ar-condicionado",
-    valor: 350.00,
+    valor_base: 350.00,
     tempo_servico: 180,
     categoria: categorias[:instalacao]
   },
   {
     nome: "Manutenção preventiva",
-    valor: 180.00,
+    valor_base: 180.00,
     tempo_servico: 120,
     categoria: categorias[:manutencao]
   },
   {
     nome: "Limpeza de ar-condicionado",
-    valor: 120.00,
+    valor_base: 120.00,
     tempo_servico: 90,
     categoria: categorias[:limpeza]
   },
   {
     nome: "Reparo de ar-condicionado",
-    valor: 250.00,
+    valor_base: 250.00,
     tempo_servico: 180,
     categoria: categorias[:reparo]
   }
 ]
 
 servicos.each do |attrs|
-  servico = Servico.find_or_initialize_by(nome: attrs[:nome])
+  servico = Servico.where("LOWER(nome) = ?", attrs[:nome].downcase).first_or_initialize
 
-  servico.valor = attrs[:valor]
+  servico.nome = attrs[:nome]
   servico.tempo_servico = attrs[:tempo_servico]
   servico.categorias_servico = attrs[:categoria]
 
   servico.save!
+
+  andares.each do |andar_info|
+    valor_por_andar = ValorPorAndar.find_or_initialize_by(
+      servico: servico,
+      andar: andar_info[:record]
+    )
+
+    valor_por_andar.valor = attrs[:valor_base] + andar_info[:acrescimo]
+    valor_por_andar.save!
+  end
 end
 
 puts "✓ Status: #{Status.count}"
 puts "✓ Prioridades: #{Prioridade.count}"
 puts "✓ Categorias: #{CategoriasServico.count}"
+puts "✓ Andares: #{Andar.count}"
 puts "✓ Serviços: #{Servico.count}"
+puts "✓ Valores por andar: #{ValorPorAndar.count}"

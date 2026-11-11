@@ -26,6 +26,160 @@ components:
 security:
 - bearer_auth: []
 paths:
+  "/api/v1/andares":
+    get:
+      summary: Lista andares
+      tags:
+      - Andares
+      description: Retorna a lista de andares cadastrados.
+      operationId: getAndares
+      responses:
+        '200':
+          description: Lista retornada com sucesso
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      example: 1
+                    descricao:
+                      type: string
+                      example: Exemplo descricao
+        '403':
+          description: Acesso negado
+          content:
+            application/json:
+              schema:
+                type: object
+    post:
+      summary: Cadastra um novo andar
+      tags:
+      - Andares
+      operationId: createAndar
+      parameters: []
+      responses:
+        '201':
+          description: Registro cadastrado com sucesso
+          content:
+            application/json:
+              schema:
+                type: object
+        '403':
+          description: Acesso negado
+          content:
+            application/json:
+              schema:
+                type: object
+        '422':
+          description: Erro de validação
+          content:
+            application/json:
+              schema:
+                type: object
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                andar:
+                  type: object
+                  properties:
+                    descricao:
+                      type: string
+                      example: Exemplo descricao
+                  required:
+                  - descricao
+              required:
+              - andar
+  "/api/v1/andares/{id}":
+    parameters:
+    - name: id
+      in: path
+      description: ID único de Andar
+      example: 1
+      required: true
+      schema:
+        type: integer
+    get:
+      summary: Visualiza detalhes de andar
+      tags:
+      - Andares
+      operationId: getAndar
+      responses:
+        '200':
+          description: Registro encontrado
+          content:
+            application/json:
+              schema:
+                type: object
+        '403':
+          description: Acesso negado
+          content:
+            application/json:
+              schema:
+                type: object
+        '404':
+          description: Registro não encontrado
+          content:
+            application/json:
+              schema:
+                type: object
+    patch:
+      summary: Atualiza andar
+      tags:
+      - Andares
+      operationId: updateAndar
+      parameters: []
+      responses:
+        '200':
+          description: Registro atualizado
+          content:
+            application/json:
+              schema:
+                type: object
+        '403':
+          description: Acesso negado
+          content:
+            application/json:
+              schema:
+                type: object
+        '422':
+          description: Erro de validação
+          content:
+            application/json:
+              schema:
+                type: object
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                andar:
+                  type: object
+                  properties:
+                    descricao:
+                      type: string
+                      example: Exemplo descricao
+    delete:
+      summary: Remove andar
+      tags:
+      - Andares
+      operationId: deleteAndar
+      responses:
+        '204':
+          description: Registro removido
+        '403':
+          description: Acesso negado
+          content:
+            application/json:
+              schema:
+                type: object
   "/api/v1/categorias_servico":
     get:
       summary: Lista categorias de serviço
