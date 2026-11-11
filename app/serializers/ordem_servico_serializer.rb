@@ -15,6 +15,7 @@ class OrdemServicoSerializer < ActiveModel::Serializer
   has_many :tecnicos, serializer: UserSerializer
   has_one :tecnico_responsavel, serializer: UserSerializer
   has_many :servicos, serializer: OsServicoSerializer
+  has_many :materiais, serializer: OsMaterialSerializer
   has_many :equipamentos, serializer: OsEquipamentoSerializer
 
   def tecnicos
@@ -27,6 +28,10 @@ class OrdemServicoSerializer < ActiveModel::Serializer
 
   def servicos
     object.os_servicos
+  end
+
+  def materiais
+    object.os_materiais
   end
 
   def equipamentos

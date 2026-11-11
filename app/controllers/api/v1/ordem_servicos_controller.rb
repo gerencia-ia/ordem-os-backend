@@ -5,7 +5,8 @@ module Api
     class OrdemServicosController < BaseController
       before_action :set_ordem_servico, only: [
         :show, :update, :destroy, :update_status, :update_laudo,
-        :add_servico, :remove_servico, :add_tecnico, :remove_tecnico
+        :add_servico, :remove_servico, :add_material, :remove_material,
+        :add_tecnico, :remove_tecnico
       ]
 
       def index
@@ -16,7 +17,8 @@ module Api
             :status, :prioridade, :endereco, :users,
             cliente: [ :telefones, :enderecos ],
             os_equipamentos: :equipamento,
-            os_servicos: { servico: :categorias_servico }
+            os_servicos: { servico: :categorias_servico },
+            os_materiais: :material
           )
         )
 
@@ -127,6 +129,26 @@ module Api
         head :no_content
       end
 
+      def add_material
+        authorize! @ordem_servico, to: :add_servico?
+        os_material = @ordem_servico.os_materiais.build(material_params_for_ordem)
+
+        if os_material.save
+          render json: @ordem_servico, status: :created
+        else
+          render_validation_errors(os_material)
+        end
+      end
+
+      def remove_material
+        authorize! @ordem_servico, to: :remove_servico?
+        os_material = @ordem_servico.os_materiais.find_by(id: params[:material_id])
+        return render json: { error: "Material não associado à ordem de serviço" }, status: :not_found unless os_material
+
+        os_material.destroy
+        head :no_content
+      end
+
       # Adiciona um técnico à ordem de serviço (via os_tecnicos)
       def add_tecnico
         authorize! @ordem_servico, to: :add_tecnico?
@@ -165,7 +187,8 @@ module Api
           :status, :prioridade, :endereco, :users,
           cliente: [ :telefones, :enderecos ],
           os_equipamentos: :equipamento,
-          os_servicos: { servico: :categorias_servico }
+          os_servicos: { servico: :categorias_servico },
+          os_materiais: :material
         ).find(params[:id])
       rescue ActiveRecord::RecordNotFound
         render json: { error: "Not found" }, status: :not_found
@@ -191,8 +214,13 @@ module Api
           user_ids: [],
           servico_ids: [],
           equipamento_ids: [],
-          os_equipamentos_attributes: [ :id, :equipamento_id, :laudo, :_destroy ]
+          os_equipamentos_attributes: [ :id, :equipamento_id, :laudo, :_destroy ],
+          os_materiais_attributes: [ :id, :material_id, :nome_material, :valor, :_destroy ]
         )
+      end
+
+      def material_params_for_ordem
+        params.permit(:material_id, :nome_material, :valor)
       end
     end
   end
