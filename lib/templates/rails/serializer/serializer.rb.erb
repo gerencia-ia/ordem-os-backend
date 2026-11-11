@@ -1,0 +1,15 @@
+# frozen_string_literal: true
+
+<% ns_parts = respond_to?(:serializer_namespace_modules, true) ? serializer_namespace_modules : class_path.map(&:camelize) -%>
+<% leaf_class = respond_to?(:serializer_leaf_class, true) ? serializer_leaf_class : "#{file_name.camelize}Serializer" -%>
+<% attr_list = [ ":id" ] + attributes.map { |a| ":#{a.column_name}" } -%>
+<% ns_parts.each_with_index do |mod, idx| -%>
+<%= "  " * idx %>module <%= mod %>
+<% end -%>
+<% indent = "  " * ns_parts.size -%>
+<%= indent %>class <%= leaf_class %> < ActiveModel::Serializer
+<%= indent %>  attributes <%= attr_list.join(", ") %>
+<%= indent %>end
+<% (ns_parts.size - 1).downto(0) do |idx| -%>
+<%= "  " * idx %>end
+<% end -%>

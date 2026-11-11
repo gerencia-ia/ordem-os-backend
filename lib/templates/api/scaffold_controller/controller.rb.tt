@@ -1,0 +1,63 @@
+# frozen_string_literal: true
+
+module Api
+  module <%= api_version_module %>
+    class <%= controller_class_name %>Controller < BaseController
+      before_action :set_<%= singular_resource_name %>, only: [ :show, :update, :destroy ]
+
+      def index
+        authorize! <%= model_class_name %>
+        @<%= plural_resource_name %> = <%= model_class_name %>.all
+        render json: @<%= plural_resource_name %>
+      end
+
+      def show
+        authorize! @<%= singular_resource_name %>
+        render json: @<%= singular_resource_name %>
+      end
+
+      def create
+        authorize! <%= model_class_name %>
+        @<%= singular_resource_name %> = <%= model_class_name %>.new(<%= singular_resource_name %>_params)
+
+        if @<%= singular_resource_name %>.save
+          render json: @<%= singular_resource_name %>, status: :created
+        else
+          render_validation_errors(@<%= singular_resource_name %>)
+        end
+      end
+
+      def update
+        authorize! @<%= singular_resource_name %>
+
+        if @<%= singular_resource_name %>.update(<%= singular_resource_name %>_params)
+          render json: @<%= singular_resource_name %>
+        else
+          render_validation_errors(@<%= singular_resource_name %>)
+        end
+      end
+
+      def destroy
+        authorize! @<%= singular_resource_name %>
+        @<%= singular_resource_name %>.destroy
+        head :no_content
+      end
+
+      private
+
+      def set_<%= singular_resource_name %>
+        @<%= singular_resource_name %> = <%= model_class_name %>.find(params[:id])
+      rescue ActiveRecord::RecordNotFound
+        render json: { error: "Not found" }, status: :not_found
+      end
+
+      def <%= singular_resource_name %>_params
+<% if permitted_params_symbols.any? -%>
+        params.require(:<%= singular_resource_name %>).permit(<%= permitted_params_symbols.join(", ") %>)
+<% else -%>
+        params.fetch(:<%= singular_resource_name %>, {}).permit
+<% end -%>
+      end
+    end
+  end
+end

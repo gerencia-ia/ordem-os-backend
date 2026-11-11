@@ -23,7 +23,8 @@ clientes = [
       marca: "Samsung",
       observacao: "Equipamento funcionando, necessita limpeza.",
       local_instalacao: "Sala",
-      btus: "12000"
+      btus: "12000",
+      andar: "Térreo"
     }
   },
 
@@ -46,7 +47,8 @@ clientes = [
       marca: "LG",
       observacao: "Apresentando falha no resfriamento.",
       local_instalacao: "Recepção",
-      btus: "18000"
+      btus: "18000",
+      andar: "1º Andar"
     }
   }
 ]
@@ -95,15 +97,17 @@ clientes.each do |attrs|
     # ----------------------------------------------------------
 
     equipamento_attrs = attrs[:equipamento]
+    andar = Andar.where("LOWER(descricao) = ?", equipamento_attrs[:andar].downcase).first!
 
-    Equipamento.find_or_create_by!(
+    equipamento = Equipamento.find_or_initialize_by(
       cliente: cliente,
       marca: equipamento_attrs[:marca]
-    ) do |equipamento|
-      equipamento.observacao = equipamento_attrs[:observacao]
-      equipamento.local_instalacao = equipamento_attrs[:local_instalacao]
-      equipamento.btus = equipamento_attrs[:btus]
-    end
+    )
+    equipamento.observacao = equipamento_attrs[:observacao]
+    equipamento.local_instalacao = equipamento_attrs[:local_instalacao]
+    equipamento.btus = equipamento_attrs[:btus]
+    equipamento.andar = andar
+    equipamento.save!
   end
 end
 

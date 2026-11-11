@@ -19,5 +19,9 @@ ActiveSupport::Inflector.inflections(:en) do |inflect|
   # ...existing inflections...
 
   # torna "status" igual no singular e no plural
-  inflect.uncountable %w( status )
+  inflect.uncountable %w[ status ]
+
+  inflect.irregular "andar", "andares"
+  inflect.irregular "material", "materiais"
+  inflect.irregular "valor_por_andar", "valores_por_andares"
 end

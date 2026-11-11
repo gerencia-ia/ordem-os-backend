@@ -8,7 +8,7 @@ class CreateOrdemServicos < ActiveRecord::Migration[6.0]
       t.date :data_fechamento
       t.string :observacao
       t.references :prioridade
-      t.decimal :valor_total
+      t.decimal :valor_total, precision: 10, scale: 2
       t.timestamps
     end
   end

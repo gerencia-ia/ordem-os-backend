@@ -26,6 +26,160 @@ components:
 security:
 - bearer_auth: []
 paths:
+  "/api/v1/andares":
+    get:
+      summary: Lista andares
+      tags:
+      - Andares
+      description: Retorna a lista de andares cadastrados.
+      operationId: getAndares
+      responses:
+        '200':
+          description: Lista retornada com sucesso
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      example: 1
+                    descricao:
+                      type: string
+                      example: Exemplo descricao
+        '403':
+          description: Acesso negado
+          content:
+            application/json:
+              schema:
+                type: object
+    post:
+      summary: Cadastra um novo andar
+      tags:
+      - Andares
+      operationId: createAndar
+      parameters: []
+      responses:
+        '201':
+          description: Registro cadastrado com sucesso
+          content:
+            application/json:
+              schema:
+                type: object
+        '403':
+          description: Acesso negado
+          content:
+            application/json:
+              schema:
+                type: object
+        '422':
+          description: Erro de validação
+          content:
+            application/json:
+              schema:
+                type: object
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                andar:
+                  type: object
+                  properties:
+                    descricao:
+                      type: string
+                      example: Exemplo descricao
+                  required:
+                  - descricao
+              required:
+              - andar
+  "/api/v1/andares/{id}":
+    parameters:
+    - name: id
+      in: path
+      description: ID único de Andar
+      example: 1
+      required: true
+      schema:
+        type: integer
+    get:
+      summary: Visualiza detalhes de andar
+      tags:
+      - Andares
+      operationId: getAndar
+      responses:
+        '200':
+          description: Registro encontrado
+          content:
+            application/json:
+              schema:
+                type: object
+        '403':
+          description: Acesso negado
+          content:
+            application/json:
+              schema:
+                type: object
+        '404':
+          description: Registro não encontrado
+          content:
+            application/json:
+              schema:
+                type: object
+    patch:
+      summary: Atualiza andar
+      tags:
+      - Andares
+      operationId: updateAndar
+      parameters: []
+      responses:
+        '200':
+          description: Registro atualizado
+          content:
+            application/json:
+              schema:
+                type: object
+        '403':
+          description: Acesso negado
+          content:
+            application/json:
+              schema:
+                type: object
+        '422':
+          description: Erro de validação
+          content:
+            application/json:
+              schema:
+                type: object
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                andar:
+                  type: object
+                  properties:
+                    descricao:
+                      type: string
+                      example: Exemplo descricao
+    delete:
+      summary: Remove andar
+      tags:
+      - Andares
+      operationId: deleteAndar
+      responses:
+        '204':
+          description: Registro removido
+        '403':
+          description: Acesso negado
+          content:
+            application/json:
+              schema:
+                type: object
   "/api/v1/categorias_servico":
     get:
       summary: Lista categorias de serviço
@@ -706,6 +860,201 @@ paths:
                         prioridade:
                           type: string
                           example: Normal
+  "/api/v1/materiais":
+    get:
+      summary: Lista catálogo de materiais
+      tags:
+      - Materiais
+      description: Retorna a lista de materiais cadastrados no catálogo com seus valores
+        de referência.
+      operationId: getMateriais
+      responses:
+        '200':
+          description: Catálogo de materiais retornado
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      example: 1
+                    nome:
+                      type: string
+                      example: Gás refrigerante R410A
+                    descricao:
+                      type: string
+                      nullable: true
+                      example: Carga de fluido refrigerante R410A para sistemas split
+                        e inverter.
+                    valor_referencia:
+                      type: string
+                      nullable: true
+                      example: '140.0'
+        '401':
+          description: Não autorizado
+          content:
+            application/json:
+              schema:
+                type: object
+    post:
+      summary: Cadastra um novo material
+      tags:
+      - Materiais
+      description: Adiciona um novo material ao catálogo (Administrador e Secretaria).
+      operationId: createMaterial
+      parameters: []
+      responses:
+        '201':
+          description: Material cadastrado com sucesso
+          content:
+            application/json:
+              schema:
+                type: object
+        '403':
+          description: Acesso negado
+          content:
+            application/json:
+              schema:
+                type: object
+        '422':
+          description: Erro de validação
+          content:
+            application/json:
+              schema:
+                type: object
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                material:
+                  type: object
+                  properties:
+                    nome:
+                      type: string
+                      example: Tubulação de cobre 1/4 pol.
+                    descricao:
+                      type: string
+                      nullable: true
+                      example: Metro de tubo de cobre flexível para linha frigorígena.
+                    valor_referencia:
+                      type: number
+                      format: decimal
+                      nullable: true
+                      example: 45.0
+                  required:
+                  - nome
+              required:
+              - material
+  "/api/v1/materiais/{id}":
+    parameters:
+    - name: id
+      in: path
+      description: ID único do Material
+      example: 1
+      required: true
+      schema:
+        type: integer
+    get:
+      summary: Visualiza detalhes de um material
+      tags:
+      - Materiais
+      operationId: getMaterial
+      responses:
+        '200':
+          description: Material encontrado
+          content:
+            application/json:
+              schema:
+                type: object
+        '401':
+          description: Não autorizado
+          content:
+            application/json:
+              schema:
+                type: object
+        '404':
+          description: Material não encontrado
+          content:
+            application/json:
+              schema:
+                type: object
+    patch:
+      summary: Atualiza dados de um material
+      tags:
+      - Materiais
+      operationId: updateMaterial
+      parameters: []
+      responses:
+        '200':
+          description: Material atualizado
+          content:
+            application/json:
+              schema:
+                type: object
+        '403':
+          description: Acesso negado
+          content:
+            application/json:
+              schema:
+                type: object
+        '404':
+          description: Material não encontrado
+          content:
+            application/json:
+              schema:
+                type: object
+        '422':
+          description: Erro de validação
+          content:
+            application/json:
+              schema:
+                type: object
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                material:
+                  type: object
+                  properties:
+                    nome:
+                      type: string
+                      example: Tubulação de cobre 3/8 pol.
+                    descricao:
+                      type: string
+                      nullable: true
+                      example: Metro de tubo de cobre flexível reforçado.
+                    valor_referencia:
+                      type: number
+                      format: decimal
+                      nullable: true
+                      example: 58.0
+    delete:
+      summary: Remove um material do catálogo
+      tags:
+      - Materiais
+      operationId: deleteMaterial
+      responses:
+        '204':
+          description: Material removido
+        '403':
+          description: Acesso negado
+          content:
+            application/json:
+              schema:
+                type: object
+        '404':
+          description: Material não encontrado
+          content:
+            application/json:
+              schema:
+                type: object
   "/api/v1/ordem_servicos":
     get:
       summary: Lista ordens de serviço
@@ -871,6 +1220,23 @@ paths:
                             type: string
                             example: Constatado acúmulo de poeira nas aletas e necessidade
                               de troca do capacitor.
+                    os_materiais_attributes:
+                      type: array
+                      description: Materiais vinculados à OS (do catálogo ou avulsos)
+                      items:
+                        type: object
+                        properties:
+                          material_id:
+                            type: integer
+                            nullable: true
+                            example: 1
+                          nome_material:
+                            type: string
+                            example: Gás refrigerante R410A
+                          valor:
+                            type: number
+                            format: decimal
+                            example: 140.0
                   required:
                   - numero_ordem
                   - cliente_id
@@ -1146,6 +1512,108 @@ paths:
           description: Serviço removido com sucesso
         '404':
           description: Serviço não associado à ordem de serviço
+          content:
+            application/json:
+              schema:
+                type: object
+  "/api/v1/ordem_servicos/{id}/materiais":
+    parameters:
+    - name: id
+      in: path
+      description: ID da Ordem de Serviço
+      example: 1
+      required: true
+      schema:
+        type: integer
+    post:
+      summary: Adiciona um material à ordem de serviço
+      tags:
+      - Ordens de Serviço
+      description: Vincula um material do catálogo (via material_id) ou avulso (informando
+        nome_material e valor) à Ordem de Serviço.
+      operationId: addMaterialToOrdem
+      parameters: []
+      responses:
+        '201':
+          description: Material adicionado com sucesso
+          content:
+            application/json:
+              schema:
+                type: object
+        '403':
+          description: Acesso negado
+          content:
+            application/json:
+              schema:
+                type: object
+        '404':
+          description: Ordem de serviço não encontrada
+          content:
+            application/json:
+              schema:
+                type: object
+        '422':
+          description: Erro de validação
+          content:
+            application/json:
+              schema:
+                type: object
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                material_id:
+                  type: integer
+                  nullable: true
+                  description: ID do material no catálogo (opcional se informar nome_material
+                    e valor)
+                  example: 1
+                nome_material:
+                  type: string
+                  description: Nome do material (preenchido automaticamente se material_id
+                    for enviado)
+                  example: Gás refrigerante R410A
+                valor:
+                  type: number
+                  format: decimal
+                  description: Valor cobrado pelo material (usa valor_referencia do
+                    catálogo se omitido)
+                  example: 140.0
+  "/api/v1/ordem_servicos/{id}/materiais/{material_id}":
+    parameters:
+    - name: id
+      in: path
+      description: ID da Ordem de Serviço
+      example: 1
+      required: true
+      schema:
+        type: integer
+    - name: material_id
+      in: path
+      description: ID do registro OsMaterial associado à ordem de serviço
+      example: 1
+      required: true
+      schema:
+        type: integer
+    delete:
+      summary: Remove um material da ordem de serviço
+      tags:
+      - Ordens de Serviço
+      description: Desvincula um item de material da Ordem de Serviço.
+      operationId: removeMaterialFromOrdem
+      responses:
+        '204':
+          description: Material removido com sucesso
+        '403':
+          description: Acesso negado
+          content:
+            application/json:
+              schema:
+                type: object
+        '404':
+          description: Material não associado à ordem de serviço
           content:
             application/json:
               schema:
@@ -2006,6 +2474,180 @@ paths:
       responses:
         '204':
           description: Usuário excluído
+        '403':
+          description: Acesso negado
+          content:
+            application/json:
+              schema:
+                type: object
+  "/api/v1/valores_por_andares":
+    get:
+      summary: Lista valores por andares
+      tags:
+      - Valores Por Andares
+      description: Retorna a lista de valores por andares cadastrados.
+      operationId: getValoresPorAndares
+      responses:
+        '200':
+          description: Lista retornada com sucesso
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      example: 1
+                    servico_id:
+                      type: integer
+                      example: 1
+                    andar_id:
+                      type: integer
+                      example: 1
+                    valor:
+                      type: string
+                      example: '10.50'
+        '403':
+          description: Acesso negado
+          content:
+            application/json:
+              schema:
+                type: object
+    post:
+      summary: Cadastra um novo valor por andar
+      tags:
+      - Valores Por Andares
+      operationId: createValorPorAndar
+      parameters: []
+      responses:
+        '201':
+          description: Registro cadastrado com sucesso
+          content:
+            application/json:
+              schema:
+                type: object
+        '403':
+          description: Acesso negado
+          content:
+            application/json:
+              schema:
+                type: object
+        '422':
+          description: Erro de validação
+          content:
+            application/json:
+              schema:
+                type: object
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                valor_por_andar:
+                  type: object
+                  properties:
+                    servico_id:
+                      type: integer
+                      example: 1
+                    andar_id:
+                      type: integer
+                      example: 1
+                    valor:
+                      type: string
+                      example: '10.50'
+                  required:
+                  - servico_id
+                  - andar_id
+                  - valor
+              required:
+              - valor_por_andar
+  "/api/v1/valores_por_andares/{id}":
+    parameters:
+    - name: id
+      in: path
+      description: ID único de ValorPorAndar
+      example: 1
+      required: true
+      schema:
+        type: integer
+    get:
+      summary: Visualiza detalhes de valor por andar
+      tags:
+      - Valores Por Andares
+      operationId: getValorPorAndar
+      responses:
+        '200':
+          description: Registro encontrado
+          content:
+            application/json:
+              schema:
+                type: object
+        '403':
+          description: Acesso negado
+          content:
+            application/json:
+              schema:
+                type: object
+        '404':
+          description: Registro não encontrado
+          content:
+            application/json:
+              schema:
+                type: object
+    patch:
+      summary: Atualiza valor por andar
+      tags:
+      - Valores Por Andares
+      operationId: updateValorPorAndar
+      parameters: []
+      responses:
+        '200':
+          description: Registro atualizado
+          content:
+            application/json:
+              schema:
+                type: object
+        '403':
+          description: Acesso negado
+          content:
+            application/json:
+              schema:
+                type: object
+        '422':
+          description: Erro de validação
+          content:
+            application/json:
+              schema:
+                type: object
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                valor_por_andar:
+                  type: object
+                  properties:
+                    servico_id:
+                      type: integer
+                      example: 1
+                    andar_id:
+                      type: integer
+                      example: 1
+                    valor:
+                      type: string
+                      example: '10.50'
+    delete:
+      summary: Remove valor por andar
+      tags:
+      - Valores Por Andares
+      operationId: deleteValorPorAndar
+      responses:
+        '204':
+          description: Registro removido
         '403':
           description: Acesso negado
           content:

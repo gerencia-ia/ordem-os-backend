@@ -59,6 +59,16 @@ servico_reparo = Servico.find_by!(
   nome: "Reparo de ar-condicionado"
 )
 
+valor_manutencao_1 = ValorPorAndar.find_by!(
+  servico: servico_manutencao,
+  andar: equipamento_1.andar
+)
+
+valor_reparo_2 = ValorPorAndar.find_by!(
+  servico: servico_reparo,
+  andar: equipamento_2.andar
+)
+
 # ============================================================
 # ORDEM DE SERVIÇO 1
 # ============================================================
@@ -77,8 +87,8 @@ ordem_1 = OrdemServico.find_or_create_by!(
   os.descricao = "Manutenção preventiva do ar-condicionado."
   os.observacao = "Cliente solicitou atendimento no período da manhã."
 
-  os.custo_estimado = 180.00
-  os.valor_total = 180.00
+  os.custo_estimado = valor_manutencao_1.valor
+  os.valor_total = valor_manutencao_1.valor
 end
 
 # ============================================================
@@ -99,8 +109,8 @@ ordem_2 = OrdemServico.find_or_create_by!(
   os.descricao = "Equipamento não está resfriando corretamente."
   os.observacao = "Verificar compressor e gás refrigerante."
 
-  os.custo_estimado = 250.00
-  os.valor_total = 250.00
+  os.custo_estimado = valor_reparo_2.valor
+  os.valor_total = valor_reparo_2.valor
 end
 
 # ============================================================
@@ -109,17 +119,22 @@ end
 
 OsServico.find_or_create_by!(
   ordem_servico: ordem_1,
-  servico: servico_manutencao
+  valor_por_andar: valor_manutencao_1,
+  equipamento: equipamento_1
 ) do |os_servico|
   os_servico.quantidade = 1
 end
 
 OsServico.find_or_create_by!(
   ordem_servico: ordem_2,
-  servico: servico_reparo
+  valor_por_andar: valor_reparo_2,
+  equipamento: equipamento_2
 ) do |os_servico|
   os_servico.quantidade = 1
 end
+
+ordem_1.recalcular_valor_total!
+ordem_2.recalcular_valor_total!
 
 # ============================================================
 # OS_EQUIPAMENTOS

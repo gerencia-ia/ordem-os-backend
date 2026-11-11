@@ -10,9 +10,15 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_11_11_000000) do
+ActiveRecord::Schema[8.0].define(version: 2026_11_11_191523) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+
+  create_table "andares", force: :cascade do |t|
+    t.string "descricao"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
 
   create_table "categorias_servicos", force: :cascade do |t|
     t.string "descricao", null: false
@@ -50,7 +56,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_11_11_000000) do
     t.datetime "updated_at", null: false
     t.string "local_instalacao"
     t.string "btus"
-    t.boolean "inverter", default: false, null: false
+    t.bigint "andar_id", null: false
+    t.index ["andar_id"], name: "index_equipamentos_on_andar_id"
     t.index ["cliente_id"], name: "index_equipamentos_on_cliente_id"
   end
 
@@ -68,12 +75,11 @@ ActiveRecord::Schema[8.0].define(version: 2026_11_11_000000) do
     t.date "data_fechamento"
     t.string "observacao"
     t.bigint "prioridade_id"
-    t.decimal "valor_total"
+    t.decimal "valor_total", precision: 10, scale: 2
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "numero_ordem"
     t.string "descricao"
-    t.string "tipo_servico"
     t.date "data_vencimento"
     t.decimal "custo_estimado", precision: 10, scale: 2
     t.bigint "cliente_id"
@@ -108,24 +114,25 @@ ActiveRecord::Schema[8.0].define(version: 2026_11_11_000000) do
   end
 
   create_table "os_servicos", force: :cascade do |t|
-    t.bigint "servico_id"
     t.bigint "ordem_servico_id"
-    t.decimal "quantidade"
+    t.integer "quantidade", default: 1
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "nome_servico"
     t.decimal "valor_unitario", precision: 10, scale: 2
+    t.bigint "valor_por_andar_id", null: false
+    t.bigint "equipamento_id", null: false
+    t.index ["equipamento_id"], name: "index_os_servicos_on_equipamento_id"
     t.index ["ordem_servico_id"], name: "index_os_servicos_on_ordem_servico_id"
-    t.index ["servico_id"], name: "index_os_servicos_on_servico_id"
+    t.index ["valor_por_andar_id"], name: "index_os_servicos_on_valor_por_andar_id"
   end
 
   create_table "os_tecnicos", force: :cascade do |t|
     t.bigint "ordem_servico_id"
-    t.bigint "tecnico_id"
+    t.bigint "user_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["ordem_servico_id"], name: "index_os_tecnicos_on_ordem_servico_id"
-    t.index ["tecnico_id"], name: "index_os_tecnicos_on_tecnico_id"
   end
 
   create_table "prioridades", force: :cascade do |t|
@@ -142,7 +149,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_11_11_000000) do
 
   create_table "servicos", force: :cascade do |t|
     t.string "nome"
-    t.decimal "valor"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "tempo_servico"
@@ -170,26 +176,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_11_11_000000) do
   create_table "tarefas", force: :cascade do |t|
     t.bigint "ordem_servico_id", null: false
     t.string "descricao"
-    t.string "status", default: "nao_iniciada"
-    t.bigint "tecnico_id"
+    t.bigint "status_id", null: false
+    t.bigint "user_id"
     t.datetime "data_inicio"
     t.datetime "data_fim"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["ordem_servico_id"], name: "index_tarefas_on_ordem_servico_id"
-    t.index ["tecnico_id"], name: "index_tarefas_on_tecnico_id"
-  end
-
-  create_table "tecnicos", force: :cascade do |t|
-    t.string "nome"
-    t.string "telefone"
-    t.string "especialidades", array: true
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.string "email"
-    t.string "status_disponibilidade", default: "disponivel"
-    t.string "cpf", null: false
-    t.index ["cpf"], name: "index_tecnicos_on_cpf", unique: true
+    t.index ["status_id"], name: "index_tarefas_on_status_id"
   end
 
   create_table "telefones", force: :cascade do |t|
@@ -201,20 +195,30 @@ ActiveRecord::Schema[8.0].define(version: 2026_11_11_000000) do
   end
 
   create_table "users", force: :cascade do |t|
+    t.string "nome"
     t.string "cpf", null: false
+    t.string "email"
+    t.string "telefone"
+    t.bigint "role_id"
     t.string "password_digest", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.integer "role", default: 0, null: false
-    t.bigint "role_id"
-    t.string "nome"
-    t.string "email"
-    t.string "telefone"
     t.index ["cpf"], name: "index_users_on_cpf", unique: true
     t.index ["role_id"], name: "index_users_on_role_id"
   end
 
+  create_table "valores_por_andares", force: :cascade do |t|
+    t.bigint "servico_id", null: false
+    t.bigint "andar_id", null: false
+    t.decimal "valor", precision: 10, scale: 2
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["andar_id"], name: "index_valores_por_andares_on_andar_id"
+    t.index ["servico_id"], name: "index_valores_por_andares_on_servico_id"
+  end
+
   add_foreign_key "enderecos", "clientes"
+  add_foreign_key "equipamentos", "andares"
   add_foreign_key "equipamentos", "clientes"
   add_foreign_key "ordem_servicos", "clientes"
   add_foreign_key "ordem_servicos", "enderecos"
@@ -224,14 +228,18 @@ ActiveRecord::Schema[8.0].define(version: 2026_11_11_000000) do
   add_foreign_key "os_equipamentos", "ordem_servicos"
   add_foreign_key "os_materiais", "materiais", column: "material_id", on_delete: :nullify
   add_foreign_key "os_materiais", "ordem_servicos"
+  add_foreign_key "os_servicos", "equipamentos"
   add_foreign_key "os_servicos", "ordem_servicos"
-  add_foreign_key "os_servicos", "servicos"
+  add_foreign_key "os_servicos", "valores_por_andares"
   add_foreign_key "os_tecnicos", "ordem_servicos"
-  add_foreign_key "os_tecnicos", "tecnicos"
+  add_foreign_key "os_tecnicos", "users"
   add_foreign_key "servicos", "categorias_servicos"
   add_foreign_key "sessions", "users"
   add_foreign_key "tarefas", "ordem_servicos"
-  add_foreign_key "tarefas", "tecnicos"
+  add_foreign_key "tarefas", "status"
+  add_foreign_key "tarefas", "users"
   add_foreign_key "telefones", "clientes"
   add_foreign_key "users", "roles"
+  add_foreign_key "valores_por_andares", "andares"
+  add_foreign_key "valores_por_andares", "servicos"
 end

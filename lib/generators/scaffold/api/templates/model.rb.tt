@@ -1,7 +1,0 @@
-# frozen_string_literal: true
-
-class <%= class_name %> < ApplicationRecord
-  <% unless attributes.empty? %>
-  validates <%= attributes.map(&:name).map { |attr| ":#{attr}" }.join(", ") %>, presence: true
-  <% end %>
-end
