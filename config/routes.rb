@@ -16,6 +16,7 @@ Rails.application.routes.draw do
         end
       end
       resources :servicos
+      resources :materiais
       resources :users
       resources :categorias_servico
       resources :status
@@ -25,6 +26,8 @@ Rails.application.routes.draw do
           patch "equipamentos/:equipamento_id/laudo", to: "ordem_servicos#update_laudo"
           post "servicos", to: "ordem_servicos#add_servico"
           delete "servicos/:servico_id", to: "ordem_servicos#remove_servico"
+          post "materiais", to: "ordem_servicos#add_material"
+          delete "materiais/:material_id", to: "ordem_servicos#remove_material"
           post "tecnicos", to: "ordem_servicos#add_tecnico"
           delete "tecnicos/:user_id", to: "ordem_servicos#remove_tecnico"
         end
