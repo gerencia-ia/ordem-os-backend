@@ -61,6 +61,8 @@ module Api
         permitted_attributes << :role_id if current_user&.admin?
 
         p = data.permit(permitted_attributes)
+
+        p[:password] = params[:password] if p[:password].blank? && params[:password].present?
         p.delete(:password) if p[:password].blank?
 
         p
