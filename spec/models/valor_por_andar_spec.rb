@@ -3,15 +3,18 @@
 require "rails_helper"
 
 RSpec.describe ValorPorAndar, type: :model do
+  let(:andar) { Andar.create!(descricao: "1º Andar") }
+  let(:servico) { Servico.create!(nome: "Limpeza") }
   let(:valid_attributes) do
     {
-      valor: 10.5
+      valor: 10.5,
+      andar: andar,
+      servico: servico
     }
   end
 
   describe "validações" do
     it "é válido com atributos e associações válidas" do
-      pending "Associe os registros pais obrigatórios em valid_attributes"
       record = described_class.new(valid_attributes)
       expect(record).to be_valid
     end

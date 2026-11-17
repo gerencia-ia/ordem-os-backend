@@ -28,9 +28,14 @@ RSpec.describe "Api::V1::ValoresPorAndares", type: :request do
     )
   end
 
+  let(:andar) { Andar.create!(descricao: "1º Andar") }
+  let(:servico) { Servico.create!(nome: "Limpeza") }
+
   let(:valid_attributes) do
     {
-      valor: 10.5
+      valor: 10.5,
+      andar_id: andar.id,
+      servico_id: servico.id
     }
   end
 
@@ -65,7 +70,6 @@ RSpec.describe "Api::V1::ValoresPorAndares", type: :request do
 
   describe "GET /api/v1/valores_por_andares" do
     it "lista os registros para administrador" do
-      pending "Associe os registros pais obrigatórios em valid_attributes"
       record = ValorPorAndar.create!(valid_attributes)
       get "/api/v1/valores_por_andares", headers: auth_header(admin)
 
@@ -77,7 +81,6 @@ RSpec.describe "Api::V1::ValoresPorAndares", type: :request do
 
   describe "GET /api/v1/valores_por_andares/:id" do
     it "retorna o registro solicitado" do
-      pending "Associe os registros pais obrigatórios em valid_attributes"
       record = ValorPorAndar.create!(valid_attributes)
       get "/api/v1/valores_por_andares/#{record.id}", headers: auth_header(admin)
 
@@ -94,7 +97,6 @@ RSpec.describe "Api::V1::ValoresPorAndares", type: :request do
 
   describe "POST /api/v1/valores_por_andares" do
     it "cria um novo registro com parâmetros válidos" do
-      pending "Associe os registros pais obrigatórios em valid_attributes"
       expect do
         post "/api/v1/valores_por_andares",
              params: { valor_por_andar: valid_attributes },
@@ -119,7 +121,6 @@ RSpec.describe "Api::V1::ValoresPorAndares", type: :request do
 
   describe "PATCH /api/v1/valores_por_andares/:id" do
     it "atualiza o registro com sucesso" do
-      pending "Associe os registros pais obrigatórios em valid_attributes"
       record = ValorPorAndar.create!(valid_attributes)
       patch "/api/v1/valores_por_andares/#{record.id}",
             params: { valor_por_andar: update_attributes },
@@ -132,7 +133,6 @@ RSpec.describe "Api::V1::ValoresPorAndares", type: :request do
 
   describe "DELETE /api/v1/valores_por_andares/:id" do
     it "remove o registro com sucesso" do
-      pending "Associe os registros pais obrigatórios em valid_attributes"
       record = ValorPorAndar.create!(valid_attributes)
       expect do
         delete "/api/v1/valores_por_andares/#{record.id}", headers: auth_header(admin)

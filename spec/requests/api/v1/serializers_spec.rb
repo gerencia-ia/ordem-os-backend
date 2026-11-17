@@ -54,12 +54,15 @@ RSpec.describe "Serializers Standardization", type: :request do
     )
   end
 
+  let!(:andar) { Andar.create!(descricao: "3º Andar") }
+
   let!(:equipamento) do
     cliente.equipamentos.create!(
       marca: "Daikin Inverter",
       btus: 18000,
       local_instalacao: "Sala de Reuniões",
-      observacao: "220V"
+      observacao: "220V",
+      andar: andar
     )
   end
 
@@ -67,9 +70,15 @@ RSpec.describe "Serializers Standardization", type: :request do
   let!(:servico) do
     Servico.create!(
       nome: "Higienização Química",
-      valor: 250.0,
       tempo_servico: 90,
       categorias_servico: categoria
+    )
+  end
+  let!(:valor_por_andar) do
+    ValorPorAndar.create!(
+      servico: servico,
+      andar: andar,
+      valor: 250.0
     )
   end
 
@@ -89,7 +98,7 @@ RSpec.describe "Serializers Standardization", type: :request do
     )
     os.os_tecnicos.create!(user: tecnico1)
     os.os_tecnicos.create!(user: tecnico2)
-    os.os_servicos.create!(servico: servico, quantidade: 2)
+    os.os_servicos.create!(equipamento: equipamento, valor_por_andar: valor_por_andar, quantidade: 2)
     os.os_equipamentos.create!(equipamento: equipamento, laudo: "Aparelho limpo e revisado com sucesso.")
     os
   end

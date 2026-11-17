@@ -3,6 +3,7 @@
 require "rails_helper"
 
 RSpec.describe Equipamento, type: :model do
+  let!(:andar) { Andar.create!(descricao: "1º Andar") }
   let!(:cliente) do
     Cliente.create!(
       nome: "Cliente Equipamento",
@@ -16,13 +17,14 @@ RSpec.describe Equipamento, type: :model do
       equipamento = cliente.equipamentos.build(
         marca: "Fujitsu",
         local_instalacao: "Escritório 3",
-        btus: "12000"
+        btus: "12000",
+        andar: andar
       )
       expect(equipamento).to be_valid
     end
 
     it "exige marca e local de instalação" do
-      equipamento = cliente.equipamentos.build
+      equipamento = cliente.equipamentos.build(andar: andar)
       expect(equipamento).not_to be_valid
       expect(equipamento.errors[:marca]).to be_present
       expect(equipamento.errors[:local_instalacao]).to be_present
@@ -33,7 +35,8 @@ RSpec.describe Equipamento, type: :model do
     it "sanitiza strings removendo espaços extras" do
       equipamento = cliente.equipamentos.create!(
         marca: "   Carrier   ",
-        local_instalacao: "   Recepção   "
+        local_instalacao: "   Recepção   ",
+        andar: andar
       )
       expect(equipamento.marca).to eq("Carrier")
       expect(equipamento.local_instalacao).to eq("Recepção")
@@ -43,7 +46,7 @@ RSpec.describe Equipamento, type: :model do
   describe "associações e integridade" do
     let!(:prioridade) { Prioridade.create!(descricao: "Média") }
     let!(:status) { Status.create!(nome: "Em Andamento") }
-    let!(:equipamento) { cliente.equipamentos.create!(marca: "Daikin", local_instalacao: "Sala VIP") }
+    let!(:equipamento) { cliente.equipamentos.create!(marca: "Daikin", local_instalacao: "Sala VIP", andar: andar) }
     let!(:os) do
       OrdemServico.create!(
         cliente: cliente,

@@ -21,6 +21,7 @@ RSpec.describe "Tabelas Pivô de Ordem de Serviço", type: :model do
   let!(:prioridade) { Prioridade.create!(descricao: "Média") }
   let!(:status) { Status.create!(nome: "Aberta") }
   let!(:role_tecnico) { Role.find_or_create_by!(nome: "Tecnico") }
+  let!(:andar) { Andar.create!(descricao: "1º Andar") }
 
   let!(:os) do
     OrdemServico.create!(
@@ -32,8 +33,8 @@ RSpec.describe "Tabelas Pivô de Ordem de Serviço", type: :model do
   end
 
   describe OsEquipamento do
-    let!(:equip_cliente) { cliente.equipamentos.create!(marca: "Daikin", local_instalacao: "Quarto") }
-    let!(:equip_outro_cliente) { outro_cliente.equipamentos.create!(marca: "Gree", local_instalacao: "Sala") }
+    let!(:equip_cliente) { cliente.equipamentos.create!(marca: "Daikin", local_instalacao: "Quarto", andar: andar) }
+    let!(:equip_outro_cliente) { outro_cliente.equipamentos.create!(marca: "Gree", local_instalacao: "Sala", andar: andar) }
 
     it "impede adicionar equipamento de outro cliente à OS" do
       os_equip = os.os_equipamentos.build(equipamento: equip_outro_cliente)
@@ -50,24 +51,26 @@ RSpec.describe "Tabelas Pivô de Ordem de Serviço", type: :model do
   end
 
   describe OsServico do
-    let!(:servico) { Servico.create!(nome: "Troca Filtro", valor: 50.0) }
+    let!(:equip_cliente) { cliente.equipamentos.create!(marca: "Daikin", local_instalacao: "Quarto", andar: andar) }
+    let!(:servico) { Servico.create!(nome: "Troca Filtro") }
+    let!(:valor_por_andar) { ValorPorAndar.create!(servico: servico, andar: andar, valor: 50.0) }
 
     it "define quantidade 1 por padrão se omitida" do
-      os_serv = os.os_servicos.create!(servico: servico)
+      os_serv = os.os_servicos.create!(equipamento: equip_cliente, valor_por_andar: valor_por_andar)
       expect(os_serv.quantidade).to eq(1)
     end
 
     it "impede quantidade menor ou igual a zero" do
-      os_serv = os.os_servicos.build(servico: servico, quantidade: 0)
+      os_serv = os.os_servicos.build(equipamento: equip_cliente, valor_por_andar: valor_por_andar, quantidade: 0)
       expect(os_serv).not_to be_valid
       expect(os_serv.errors[:quantidade]).to be_present
     end
 
     it "impede duplicar o mesmo serviço na mesma OS" do
-      os.os_servicos.create!(servico: servico, quantidade: 1)
-      duplicado = os.os_servicos.build(servico: servico, quantidade: 2)
+      os.os_servicos.create!(equipamento: equip_cliente, valor_por_andar: valor_por_andar, quantidade: 1)
+      duplicado = os.os_servicos.build(equipamento: equip_cliente, valor_por_andar: valor_por_andar, quantidade: 2)
       expect(duplicado).not_to be_valid
-      expect(duplicado.errors[:servico_id]).to include("já está adicionado a esta ordem de serviço")
+      expect(duplicado.errors[:valor_por_andar_id]).to include("já está adicionado para este equipamento nesta ordem de serviço")
     end
   end
 

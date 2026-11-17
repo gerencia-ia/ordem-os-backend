@@ -1,14 +1,32 @@
 # frozen_string_literal: true
 
 class OsServicoSerializer < ActiveModel::Serializer
-  attributes :id, :servico_id, :nome, :valor, :tempo_servico, :quantidade, :categoria
+  attributes :id, :servico_id, :equipamento_id, :valor_por_andar_id, :nome, :valor, :tempo_servico, :quantidade, :categoria, :andar
 
   def id
-    object.servico_id
+    object.id
   end
 
   def servico_id
-    object.servico_id
+    object.valor_por_andar&.servico_id
+  end
+
+  def equipamento_id
+    object.equipamento_id
+  end
+
+  def valor_por_andar_id
+    object.valor_por_andar_id
+  end
+
+  def andar
+    a = object.valor_por_andar&.andar
+    return nil unless a
+
+    {
+      id: a.id,
+      descricao: a.descricao
+    }
   end
 
   def nome
@@ -16,7 +34,7 @@ class OsServicoSerializer < ActiveModel::Serializer
   end
 
   def valor
-    object.valor_unitario || object.servico&.valor
+    object.valor_unitario || object.valor_por_andar&.valor
   end
 
   def tempo_servico
