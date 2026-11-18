@@ -16,7 +16,7 @@ module Api
           OrdemServico.includes(
             :status, :prioridade, :endereco, :users,
             cliente: [ :telefones, :enderecos ],
-            os_equipamentos: :equipamento,
+            os_equipamentos: { equipamento: :andar },
             os_servicos: { servico: :categorias_servico },
             os_materiais: :material
           )
