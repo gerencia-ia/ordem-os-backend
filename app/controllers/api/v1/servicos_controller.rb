@@ -7,13 +7,13 @@ module Api
 
       def index
         authorize! Servico
-        @servicos = Servico.includes(:categorias_servico).all
-        render json: @servicos, include: :categorias_servico
+        @servicos = Servico.includes(:categorias_servico, valores_por_andares: :andar).all
+        render json: @servicos, include: [ :categorias_servico, :valores_por_andares ]
       end
 
       def show
         authorize! @servico
-        render json: @servico
+        render json: @servico, include: [ :categorias_servico, :valores_por_andares ]
       end
 
       def create
@@ -50,7 +50,10 @@ module Api
       end
 
       def servico_params
-        params.require(:servico).permit(:nome, :valor, :tempo_servico, :categorias_servico_id)
+        params.require(:servico).permit(
+          :nome, :tempo_servico, :categorias_servico_id,
+          valores_por_andares_attributes: [ :id, :andar_id, :valor, :_destroy ]
+        )
       end
     end
   end

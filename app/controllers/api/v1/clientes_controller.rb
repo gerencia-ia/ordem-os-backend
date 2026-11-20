@@ -58,7 +58,7 @@ module Api
           :nome, :email, :data_registro, :data_ultima_visita,
           enderecos_attributes: [ :id, :rua, :numero, :bairro, :complemento, :cep, :cidade, :_destroy ],
           telefones_attributes: [ :id, :numero, :_destroy ],
-          equipamentos_attributes: [ :id, :marca, :btus, :local_instalacao, :observacao, :_destroy ]
+          equipamentos_attributes: [ :id, :marca, :btus, :local_instalacao, :observacao, :andar_id, :_destroy ]
         )
       end
 

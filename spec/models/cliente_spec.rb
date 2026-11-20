@@ -84,12 +84,13 @@ RSpec.describe Cliente, type: :model do
   end
 
   describe "associações e deleção em cascata" do
+    let!(:andar) { Andar.create!(descricao: "Térreo") }
     let!(:cliente) do
       Cliente.create!(
         nome: "Cliente Deleção",
         enderecos_attributes: [ valid_endereco_params ],
         telefones_attributes: [ valid_telefone_params ],
-        equipamentos_attributes: [ { marca: "LG", local_instalacao: "Sala 1" } ]
+        equipamentos_attributes: [ { marca: "LG", local_instalacao: "Sala 1", andar: andar } ]
       )
     end
 

@@ -24,7 +24,7 @@ RSpec.describe CategoriasServico, type: :model do
 
   describe "integridade relacional" do
     let!(:categoria) { CategoriasServico.create!(descricao: "Elétrica") }
-    let!(:servico) { Servico.create!(nome: "Troca de Disjuntor", valor: 120.0, categorias_servico: categoria) }
+    let!(:servico) { Servico.create!(nome: "Troca de Disjuntor", categorias_servico: categoria) }
 
     it "impede exclusão se houver serviços associados" do
       expect { categoria.destroy }.not_to change(CategoriasServico, :count)
