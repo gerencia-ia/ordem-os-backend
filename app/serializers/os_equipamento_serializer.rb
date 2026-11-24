@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class OsEquipamentoSerializer < ActiveModel::Serializer
-  attributes :id, :equipamento_id, :marca, :btus, :local_instalacao, :observacao, :laudo
+  attributes :id, :equipamento_id, :marca, :btus, :local_instalacao, :observacao, :andar_id, :andar, :laudo
 
   def id
     object.equipamento_id
@@ -25,5 +25,19 @@ class OsEquipamentoSerializer < ActiveModel::Serializer
 
   def observacao
     object.equipamento&.observacao
+  end
+
+  def andar_id
+    object.equipamento&.andar_id
+  end
+
+  def andar
+    andar = object.equipamento&.andar
+    return nil unless andar
+
+    {
+      id: andar.id,
+      descricao: andar.descricao
+    }
   end
 end

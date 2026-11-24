@@ -16,7 +16,7 @@ module Api
           OrdemServico.includes(
             :status, :prioridade, :endereco, :users,
             cliente: [ :telefones, :enderecos ],
-            os_equipamentos: :equipamento,
+            os_equipamentos: { equipamento: :andar },
             os_servicos: { servico: :categorias_servico },
             os_materiais: :material
           )
@@ -98,20 +98,37 @@ module Api
       def add_servico
         authorize! @ordem_servico, to: :add_servico?
 
-        servico = Servico.find_by(id: params[:servico_id])
-        return render json: { error: "Serviço não encontrado" }, status: :not_found unless servico
+        equipamento = @ordem_servico.equipamentos.find_by(id: params[:equipamento_id]) ||
+                      Equipamento.find_by(id: params[:equipamento_id])
+        return render json: { error: "Equipamento não encontrado" }, status: :not_found unless equipamento
 
-        os_servico = @ordem_servico.os_servicos.find_or_initialize_by(servico_id: servico.id)
+        valor_por_andar = if params[:valor_por_andar_id].present?
+          ValorPorAndar.find_by(id: params[:valor_por_andar_id])
+        elsif params[:servico_id].present?
+          ValorPorAndar.find_by(servico_id: params[:servico_id], andar_id: equipamento.andar_id)
+        end
+
+        return render json: { error: "Valor do serviço para o andar não encontrado" }, status: :not_found unless valor_por_andar
+
+        os_servico = @ordem_servico.os_servicos.find_or_initialize_by(
+          equipamento_id: equipamento.id,
+          valor_por_andar_id: valor_por_andar.id
+        )
         os_servico.quantidade = params[:quantidade] if params[:quantidade].present?
-        os_servico.nome_servico ||= servico.nome
-        os_servico.valor_unitario ||= servico.valor
+        os_servico.nome_servico ||= valor_por_andar.servico&.nome
+        os_servico.valor_unitario ||= valor_por_andar.valor
 
         if os_servico.save
+          @ordem_servico.recalcular_valor_total!
           render json: {
             id: os_servico.id,
             ordem_servico_id: @ordem_servico.id,
-            servico_id: servico.id,
-            quantidade: os_servico.quantidade
+            servico_id: valor_por_andar.servico_id,
+            equipamento_id: equipamento.id,
+            valor_por_andar_id: valor_por_andar.id,
+            quantidade: os_servico.quantidade,
+            nome: os_servico.nome_servico,
+            valor: os_servico.valor_unitario
           }, status: :created
         else
           render_validation_errors(os_servico)
@@ -122,10 +139,13 @@ module Api
       def remove_servico
         authorize! @ordem_servico, to: :remove_servico?
 
-        os_servico = @ordem_servico.os_servicos.find_by(servico_id: params[:servico_id])
+        os_servico = @ordem_servico.os_servicos.find_by(id: params[:servico_id])
+        os_servico ||= @ordem_servico.os_servicos.joins(:valor_por_andar).find_by(valores_por_andares: { servico_id: params[:servico_id] })
+
         return render json: { error: "Serviço não associado à ordem de serviço" }, status: :not_found unless os_servico
 
         os_servico.destroy
+        @ordem_servico.recalcular_valor_total!
         head :no_content
       end
 
@@ -214,6 +234,7 @@ module Api
           user_ids: [],
           servico_ids: [],
           equipamento_ids: [],
+          os_servicos_attributes: [ :id, :equipamento_id, :valor_por_andar_id, :quantidade, :_destroy ],
           os_equipamentos_attributes: [ :id, :equipamento_id, :laudo, :_destroy ],
           os_materiais_attributes: [ :id, :material_id, :nome_material, :valor, :_destroy ]
         )

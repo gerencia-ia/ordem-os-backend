@@ -143,8 +143,12 @@ RSpec.describe OrdemServico, type: :model do
   end
 
   describe "#recalcular_valor_total!" do
-    let!(:servico1) { Servico.create!(nome: "Carga Gás", valor: 200.0) }
-    let!(:servico2) { Servico.create!(nome: "Higienização", valor: 150.0) }
+    let!(:andar) { Andar.create!(descricao: "1º Andar") }
+    let!(:equipamento) { cliente.equipamentos.create!(marca: "Carrier", local_instalacao: "Sala 1", andar: andar) }
+    let!(:servico1) { Servico.create!(nome: "Carga Gás") }
+    let!(:servico2) { Servico.create!(nome: "Higienização") }
+    let!(:vpa1) { ValorPorAndar.create!(servico: servico1, andar: andar, valor: 200.0) }
+    let!(:vpa2) { ValorPorAndar.create!(servico: servico2, andar: andar, valor: 150.0) }
 
     it "recalcula a soma com base nos itens de serviço vinculados" do
       os = OrdemServico.create!(
@@ -154,8 +158,8 @@ RSpec.describe OrdemServico, type: :model do
         status: status
       )
 
-      os.os_servicos.create!(servico: servico1, quantidade: 2) # 400.0
-      os.os_servicos.create!(servico: servico2, quantidade: 1) # 150.0
+      os.os_servicos.create!(equipamento: equipamento, valor_por_andar: vpa1, quantidade: 2) # 400.0
+      os.os_servicos.create!(equipamento: equipamento, valor_por_andar: vpa2, quantidade: 1) # 150.0
 
       os.recalcular_valor_total!
       expect(os.reload.valor_total).to eq(550.0)

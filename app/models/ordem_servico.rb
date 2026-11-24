@@ -16,6 +16,7 @@ class OrdemServico < ApplicationRecord
   has_many :os_servicos, dependent: :destroy, inverse_of: :ordem_servico
   has_many :valores_por_andares, through: :os_servicos, source: :valor_por_andar
   has_many :servicos, through: :valores_por_andares, source: :servico
+  accepts_nested_attributes_for :os_servicos, allow_destroy: true
   has_many :os_materiais, dependent: :destroy, inverse_of: :ordem_servico
   has_many :materiais, through: :os_materiais, source: :material
   accepts_nested_attributes_for :os_materiais, allow_destroy: true

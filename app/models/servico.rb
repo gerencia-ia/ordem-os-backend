@@ -9,6 +9,8 @@ class Servico < ApplicationRecord
   has_many :os_servicos, through: :valores_por_andares
   has_many :ordem_servicos, through: :os_servicos, source: :ordem_servico
 
+  accepts_nested_attributes_for :valores_por_andares, allow_destroy: true
+
   validates :nome, presence: true, uniqueness: { case_sensitive: false }
   validates :tempo_servico, numericality: { only_integer: true, greater_than_or_equal_to: 0 }, allow_nil: true
 end
