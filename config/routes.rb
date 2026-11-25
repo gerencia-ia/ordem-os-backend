@@ -23,6 +23,8 @@ Rails.application.routes.draw do
       resources :ordem_servicos do
         member do
           patch :update_status
+          post "equipamentos", to: "ordem_servicos#add_equipamento"
+          delete "equipamentos/:equipamento_id", to: "ordem_servicos#remove_equipamento"
           patch "equipamentos/:equipamento_id/laudo", to: "ordem_servicos#update_laudo"
           post "servicos", to: "ordem_servicos#add_servico"
           delete "servicos/:servico_id", to: "ordem_servicos#remove_servico"

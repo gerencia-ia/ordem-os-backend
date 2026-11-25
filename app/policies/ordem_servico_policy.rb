@@ -37,6 +37,14 @@ class OrdemServicoPolicy < ApplicationPolicy
     admin_or_secretaria? || assigned_tecnico?
   end
 
+  def add_equipamento?
+    admin_or_secretaria?
+  end
+
+  def remove_equipamento?
+    admin_or_secretaria?
+  end
+
   def add_servico?
     admin_or_secretaria?
   end

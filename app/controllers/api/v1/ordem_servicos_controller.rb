@@ -5,6 +5,7 @@ module Api
     class OrdemServicosController < BaseController
       before_action :set_ordem_servico, only: [
         :show, :update, :destroy, :update_status, :update_laudo,
+        :add_equipamento, :remove_equipamento,
         :add_servico, :remove_servico, :add_material, :remove_material,
         :add_tecnico, :remove_tecnico
       ]
@@ -69,6 +70,49 @@ module Api
         else
           render_validation_errors(@ordem_servico)
         end
+      end
+
+      # Adiciona um equipamento à ordem de serviço
+      def add_equipamento
+        authorize! @ordem_servico, to: :add_equipamento?
+
+        if os_finalizada?
+          return render json: { error: "Não é possível alterar equipamentos de uma ordem de serviço concluída ou cancelada" },
+                        status: :unprocessable_entity
+        end
+
+        equipamento = Equipamento.find_by(id: params[:equipamento_id])
+        return render json: { error: "Equipamento não encontrado" }, status: :not_found unless equipamento
+
+        os_equipamento = @ordem_servico.os_equipamentos.build(equipamento: equipamento)
+
+        if os_equipamento.save
+          @ordem_servico.os_equipamentos.reload
+          render json: @ordem_servico, status: :created
+        else
+          render_validation_errors(os_equipamento)
+        end
+      end
+
+      # Remove um equipamento da ordem de serviço
+      def remove_equipamento
+        authorize! @ordem_servico, to: :remove_equipamento?
+
+        if os_finalizada?
+          return render json: { error: "Não é possível alterar equipamentos de uma ordem de serviço concluída ou cancelada" },
+                        status: :unprocessable_entity
+        end
+
+        os_equipamento = @ordem_servico.os_equipamentos.find_by(equipamento_id: params[:equipamento_id])
+        return render json: { error: "Equipamento não associado à ordem de serviço" }, status: :not_found unless os_equipamento
+
+        if @ordem_servico.os_servicos.exists?(equipamento_id: os_equipamento.equipamento_id)
+          return render json: { error: "Não é possível remover equipamento com serviços vinculados nesta ordem de serviço" },
+                        status: :unprocessable_entity
+        end
+
+        os_equipamento.destroy
+        head :no_content
       end
 
       # Atualiza o laudo de um equipamento específico na OS
@@ -242,6 +286,10 @@ module Api
 
       def material_params_for_ordem
         params.permit(:material_id, :nome_material, :valor)
+      end
+
+      def os_finalizada?
+        [ "concluída", "concluida", "cancelada" ].include?(@ordem_servico.status&.nome&.downcase)
       end
     end
   end
