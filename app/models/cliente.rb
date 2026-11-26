@@ -8,6 +8,7 @@ class Cliente < ApplicationRecord
   has_many :telefones, dependent: :destroy, inverse_of: :cliente
   has_many :equipamentos, dependent: :destroy, inverse_of: :cliente
   has_many :ordem_servicos, dependent: :restrict_with_error, inverse_of: :cliente
+  has_many :orcamentos, dependent: :restrict_with_error, inverse_of: :cliente
 
   accepts_nested_attributes_for :enderecos, allow_destroy: true
   accepts_nested_attributes_for :telefones, allow_destroy: true

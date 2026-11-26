@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_11_11_191523) do
+ActiveRecord::Schema[8.0].define(version: 2026_11_26_021739) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -67,6 +67,64 @@ ActiveRecord::Schema[8.0].define(version: 2026_11_11_191523) do
     t.decimal "valor_referencia", precision: 10, scale: 2
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "orcamento_equipamentos", force: :cascade do |t|
+    t.bigint "orcamento_id", null: false
+    t.bigint "equipamento_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["equipamento_id"], name: "index_orcamento_equipamentos_on_equipamento_id"
+    t.index ["orcamento_id", "equipamento_id"], name: "idx_on_orcamento_id_equipamento_id_37a34327c0", unique: true
+    t.index ["orcamento_id"], name: "index_orcamento_equipamentos_on_orcamento_id"
+  end
+
+  create_table "orcamento_materiais", force: :cascade do |t|
+    t.bigint "orcamento_id", null: false
+    t.bigint "material_id"
+    t.string "nome_material", null: false
+    t.decimal "valor", precision: 10, scale: 2, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["material_id"], name: "index_orcamento_materiais_on_material_id"
+    t.index ["orcamento_id"], name: "index_orcamento_materiais_on_orcamento_id"
+  end
+
+  create_table "orcamento_servicos", force: :cascade do |t|
+    t.bigint "orcamento_id", null: false
+    t.bigint "equipamento_id", null: false
+    t.bigint "valor_por_andar_id", null: false
+    t.integer "quantidade", default: 1, null: false
+    t.string "nome_servico"
+    t.decimal "valor_unitario", precision: 10, scale: 2
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["equipamento_id"], name: "index_orcamento_servicos_on_equipamento_id"
+    t.index ["orcamento_id", "equipamento_id", "valor_por_andar_id"], name: "idx_orc_servicos_unique", unique: true
+    t.index ["orcamento_id"], name: "index_orcamento_servicos_on_orcamento_id"
+    t.index ["valor_por_andar_id"], name: "index_orcamento_servicos_on_valor_por_andar_id"
+  end
+
+  create_table "orcamentos", force: :cascade do |t|
+    t.string "numero_orcamento", null: false
+    t.bigint "cliente_id", null: false
+    t.bigint "endereco_id", null: false
+    t.bigint "ordem_servico_id"
+    t.string "status", default: "rascunho", null: false
+    t.date "data_validade"
+    t.decimal "subtotal_servicos", precision: 10, scale: 2, default: "0.0", null: false
+    t.decimal "subtotal_materiais", precision: 10, scale: 2, default: "0.0", null: false
+    t.decimal "desconto", precision: 10, scale: 2, default: "0.0", null: false
+    t.decimal "valor_total", precision: 10, scale: 2, default: "0.0", null: false
+    t.text "condicoes_pagamento"
+    t.text "observacao"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["cliente_id"], name: "index_orcamentos_on_cliente_id"
+    t.index ["endereco_id"], name: "index_orcamentos_on_endereco_id"
+    t.index ["numero_orcamento"], name: "index_orcamentos_on_numero_orcamento", unique: true
+    t.index ["ordem_servico_id"], name: "index_orcamentos_on_ordem_servico_id", unique: true, where: "(ordem_servico_id IS NOT NULL)"
+    t.index ["status"], name: "index_orcamentos_on_status"
   end
 
   create_table "ordem_servicos", force: :cascade do |t|
@@ -220,13 +278,23 @@ ActiveRecord::Schema[8.0].define(version: 2026_11_11_191523) do
   add_foreign_key "enderecos", "clientes"
   add_foreign_key "equipamentos", "andares"
   add_foreign_key "equipamentos", "clientes"
+  add_foreign_key "orcamento_equipamentos", "equipamentos"
+  add_foreign_key "orcamento_equipamentos", "orcamentos"
+  add_foreign_key "orcamento_materiais", "materiais", on_delete: :nullify
+  add_foreign_key "orcamento_materiais", "orcamentos"
+  add_foreign_key "orcamento_servicos", "equipamentos"
+  add_foreign_key "orcamento_servicos", "orcamentos"
+  add_foreign_key "orcamento_servicos", "valores_por_andares"
+  add_foreign_key "orcamentos", "clientes"
+  add_foreign_key "orcamentos", "enderecos"
+  add_foreign_key "orcamentos", "ordem_servicos", on_delete: :nullify
   add_foreign_key "ordem_servicos", "clientes"
   add_foreign_key "ordem_servicos", "enderecos"
   add_foreign_key "ordem_servicos", "prioridades"
   add_foreign_key "ordem_servicos", "status"
   add_foreign_key "os_equipamentos", "equipamentos"
   add_foreign_key "os_equipamentos", "ordem_servicos"
-  add_foreign_key "os_materiais", "materiais", column: "material_id", on_delete: :nullify
+  add_foreign_key "os_materiais", "materiais", on_delete: :nullify
   add_foreign_key "os_materiais", "ordem_servicos"
   add_foreign_key "os_servicos", "equipamentos"
   add_foreign_key "os_servicos", "ordem_servicos"

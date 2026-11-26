@@ -36,6 +36,12 @@ Rails.application.routes.draw do
       end
       resources :prioridades
       resources :roles
+      resources :orcamentos do
+        member do
+          patch :update_status
+          post :converter_em_os
+        end
+      end
       post "login", to: "sessions#create"
       delete "logout", to: "sessions#destroy"
 

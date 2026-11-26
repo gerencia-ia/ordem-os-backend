@@ -26,6 +26,7 @@ class OrdemServico < ApplicationRecord
   accepts_nested_attributes_for :os_equipamentos, allow_destroy: true
 
   has_many :tarefas, dependent: :destroy, inverse_of: :ordem_servico
+  has_one :orcamento, dependent: :nullify, inverse_of: :ordem_servico
 
   before_validation :generate_numero_ordem, on: :create
 

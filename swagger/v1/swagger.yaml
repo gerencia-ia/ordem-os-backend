@@ -1055,6 +1055,382 @@ paths:
             application/json:
               schema:
                 type: object
+  "/api/v1/orcamentos":
+    get:
+      summary: Lista orçamentos
+      tags:
+      - Orçamentos
+      description: Retorna a lista de orçamentos cadastrados (Administrador e Secretaria).
+      operationId: getOrcamentos
+      parameters:
+      - name: cliente_id
+        in: query
+        required: false
+        description: Filtrar por cliente
+        schema:
+          type: integer
+      - name: status
+        in: query
+        required: false
+        description: Filtrar por status
+        schema:
+          type: string
+      - name: mes
+        in: query
+        required: false
+        description: Filtrar por mês de criação (1 a 12)
+        schema:
+          type: integer
+      - name: ano
+        in: query
+        required: false
+        description: Filtrar por ano de criação
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Lista de orçamentos retornada
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+        '401':
+          description: Não autorizado
+          content:
+            application/json:
+              schema:
+                type: object
+        '403':
+          description: Acesso negado
+          content:
+            application/json:
+              schema:
+                type: object
+    post:
+      summary: Cria um novo orçamento
+      tags:
+      - Orçamentos
+      description: Cria um novo orçamento vinculado a cliente, endereço, equipamentos,
+        serviços por andar e materiais.
+      operationId: createOrcamento
+      parameters: []
+      responses:
+        '201':
+          description: Orçamento criado com sucesso
+          content:
+            application/json:
+              schema:
+                type: object
+        '403':
+          description: Acesso negado
+          content:
+            application/json:
+              schema:
+                type: object
+        '422':
+          description: Erro de validação
+          content:
+            application/json:
+              schema:
+                type: object
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                orcamento:
+                  type: object
+                  properties:
+                    cliente_id:
+                      type: integer
+                      example: 1
+                    endereco_id:
+                      type: integer
+                      example: 1
+                    status:
+                      type: string
+                      example: rascunho
+                    data_validade:
+                      type: string
+                      format: date
+                      nullable: true
+                      example: '2026-12-31'
+                    desconto:
+                      type: number
+                      format: decimal
+                      example: 50.0
+                    condicoes_pagamento:
+                      type: string
+                      nullable: true
+                      example: 50% entrada e 50% na entrega
+                    observacao:
+                      type: string
+                      nullable: true
+                      example: Orçamento válido por 15 dias.
+                    equipamento_ids:
+                      type: array
+                      items:
+                        type: integer
+                      example:
+                      - 1
+                    orcamento_servicos_attributes:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          equipamento_id:
+                            type: integer
+                            example: 1
+                          valor_por_andar_id:
+                            type: integer
+                            example: 1
+                          quantidade:
+                            type: integer
+                            example: 1
+                    orcamento_materiais_attributes:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          material_id:
+                            type: integer
+                            nullable: true
+                            example: 1
+                          nome_material:
+                            type: string
+                            example: Gás refrigerante R410A
+                          valor:
+                            type: number
+                            format: decimal
+                            example: 140.0
+                  required:
+                  - cliente_id
+                  - endereco_id
+              required:
+              - orcamento
+  "/api/v1/orcamentos/{id}":
+    parameters:
+    - name: id
+      in: path
+      description: ID do Orçamento
+      example: 1
+      required: true
+      schema:
+        type: integer
+    get:
+      summary: Visualiza detalhes de um orçamento
+      tags:
+      - Orçamentos
+      operationId: getOrcamento
+      responses:
+        '200':
+          description: Orçamento encontrado
+          content:
+            application/json:
+              schema:
+                type: object
+        '403':
+          description: Acesso negado
+          content:
+            application/json:
+              schema:
+                type: object
+        '404':
+          description: Orçamento não encontrado
+          content:
+            application/json:
+              schema:
+                type: object
+    patch:
+      summary: Atualiza um orçamento
+      tags:
+      - Orçamentos
+      operationId: updateOrcamento
+      parameters: []
+      responses:
+        '200':
+          description: Orçamento atualizado
+          content:
+            application/json:
+              schema:
+                type: object
+        '403':
+          description: Acesso negado
+          content:
+            application/json:
+              schema:
+                type: object
+        '404':
+          description: Orçamento não encontrado
+          content:
+            application/json:
+              schema:
+                type: object
+        '422':
+          description: Erro de validação ou orçamento já convertido
+          content:
+            application/json:
+              schema:
+                type: object
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                orcamento:
+                  type: object
+                  properties:
+                    desconto:
+                      type: number
+                      format: decimal
+                      example: 30.0
+                    data_validade:
+                      type: string
+                      format: date
+                      example: '2026-12-31'
+                    observacao:
+                      type: string
+                      example: Observação atualizada
+    delete:
+      summary: Exclui um orçamento
+      tags:
+      - Orçamentos
+      operationId: deleteOrcamento
+      responses:
+        '204':
+          description: Orçamento excluído
+        '403':
+          description: Acesso negado
+          content:
+            application/json:
+              schema:
+                type: object
+        '404':
+          description: Orçamento não encontrado
+          content:
+            application/json:
+              schema:
+                type: object
+        '422':
+          description: Orçamento já convertido não pode ser excluído
+          content:
+            application/json:
+              schema:
+                type: object
+  "/api/v1/orcamentos/{id}/update_status":
+    parameters:
+    - name: id
+      in: path
+      description: ID do Orçamento
+      example: 1
+      required: true
+      schema:
+        type: integer
+    patch:
+      summary: Atualiza o status do orçamento
+      tags:
+      - Orçamentos
+      operationId: updateOrcamentoStatus
+      parameters: []
+      responses:
+        '200':
+          description: Status atualizado
+          content:
+            application/json:
+              schema:
+                type: object
+        '403':
+          description: Acesso negado
+          content:
+            application/json:
+              schema:
+                type: object
+        '422':
+          description: Status inválido ou orçamento já convertido
+          content:
+            application/json:
+              schema:
+                type: object
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+                  example: aprovado
+              required:
+              - status
+  "/api/v1/orcamentos/{id}/converter_em_os":
+    parameters:
+    - name: id
+      in: path
+      description: ID do Orçamento
+      example: 1
+      required: true
+      schema:
+        type: integer
+    post:
+      summary: Converte um orçamento aprovado em Ordem de Serviço
+      tags:
+      - Orçamentos
+      operationId: converterOrcamentoEmOs
+      parameters: []
+      responses:
+        '201':
+          description: Ordem de Serviço criada a partir do orçamento
+          content:
+            application/json:
+              schema:
+                type: object
+        '403':
+          description: Acesso negado
+          content:
+            application/json:
+              schema:
+                type: object
+        '422':
+          description: Orçamento não aprovado ou já convertido
+          content:
+            application/json:
+              schema:
+                type: object
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                prioridade_id:
+                  type: integer
+                  nullable: true
+                  example: 2
+                status_id:
+                  type: integer
+                  nullable: true
+                  example: 1
+                data_agendamento:
+                  type: string
+                  format: date_time
+                  nullable: true
+                  example: '2026-12-01T09:00:00Z'
+                descricao:
+                  type: string
+                  nullable: true
+                observacao:
+                  type: string
+                  nullable: true
+                tecnico_ids:
+                  type: array
+                  items:
+                    type: integer
+                  example:
+                  - 2
   "/api/v1/ordem_servicos":
     get:
       summary: Lista ordens de serviço

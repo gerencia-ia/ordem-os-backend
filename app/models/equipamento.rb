@@ -8,6 +8,9 @@ class Equipamento < ApplicationRecord
   has_many :os_equipamentos, dependent: :restrict_with_error, inverse_of: :equipamento
   has_many :ordem_servicos, through: :os_equipamentos, source: :ordem_servico
   has_many :os_servicos, dependent: :restrict_with_error, inverse_of: :equipamento
+  has_many :orcamento_equipamentos, dependent: :restrict_with_error, inverse_of: :equipamento
+  has_many :orcamentos, through: :orcamento_equipamentos, source: :orcamento
+  has_many :orcamento_servicos, dependent: :restrict_with_error, inverse_of: :equipamento
 
   validates :marca, :local_instalacao, presence: true
 

@@ -6,6 +6,7 @@ class Endereco < ApplicationRecord
 
   belongs_to :cliente, inverse_of: :enderecos
   has_many :ordem_servicos, dependent: :restrict_with_error, inverse_of: :endereco
+  has_many :orcamentos, dependent: :restrict_with_error, inverse_of: :endereco
 
   validates :rua, :numero, :bairro, :cidade, presence: true
   validates :cep, length: { is: 8, message: "deve conter 8 dígitos numéricos" }, allow_blank: true
